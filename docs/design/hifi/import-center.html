@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LayoutForge — Import Center (hi-fi mockup)</title>
+<link rel="stylesheet" href="lf-mockup.css">
+<script src="lf-mockup.js"></script>
+<style>
+  .imp { flex:1; overflow:auto; padding:var(--lf-sp-xl); display:flex; flex-direction:column; gap:var(--lf-sp-lg); max-width:820px; width:100%; margin:0 auto; }
+  .imp h1 { margin:0; font:600 var(--lf-fs-xl) var(--lf-font-ui); }
+  .recent { width:100%; border-collapse:collapse; font-size:var(--lf-fs-sm); }
+  .recent td { padding:8px 10px; border-bottom:1px solid var(--lf-border); }
+  .recent td:last-child { text-align:right; }
+</style>
+</head>
+<body>
+<div class="lf-app">
+
+  <nav class="lf-rail" aria-label="Global navigation">
+    <button class="lf-rail-item" title="Dashboard"><span class="glyph">⌂</span>Home</button>
+    <button class="lf-rail-item" title="Projects"><span class="glyph">▤</span>Projects</button>
+    <button class="lf-rail-item active" title="Import"><span class="glyph">⇪</span>Import</button>
+    <div class="lf-rail-spacer"></div>
+    <button class="lf-rail-item" title="Settings"><span class="glyph">⚙</span>Settings</button>
+  </nav>
+
+  <div class="lf-main">
+    <div class="lf-quickbar" role="toolbar" aria-label="Quick actions">
+      <span style="font:600 var(--lf-fs-md) var(--lf-font-ui)">Import</span>
+      <span class="spacer"></span>
+      <button class="lf-btn ghost">⌘K</button>
+    </div>
+
+    <div class="imp">
+
+      <div class="lf-dropzone" role="button" tabindex="0" aria-label="Import PDF" style="padding:var(--lf-sp-lg)">
+        <span class="big">⇪</span>
+        <div><strong>Drop PDF here</strong>, or <button class="lf-btn sm">Choose file</button></div>
+        <div style="font-size:var(--lf-fs-xs)">PDF up to 250 MB · processed on this server</div>
+      </div>
+
+      <div class="lf-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <strong style="font-size:var(--lf-fs-sm)">Science Textbook Gr.4.pdf</strong>
+          <span style="font-size:var(--lf-fs-xs);color:var(--lf-text-muted)">48 MB</span>
+          <span class="lf-badge processing">Processing</span>
+          <span style="margin-left:auto;font-size:var(--lf-fs-xs);color:var(--lf-text-muted)">est. ~3 min remaining</span>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <span style="font-size:var(--lf-fs-xs);color:var(--lf-text-muted);width:52px">Upload</span>
+          <div class="lf-progress" style="flex:1"><i style="width:100%"></i></div>
+          <span style="font-size:var(--lf-fs-xs);color:var(--lf-success)">done (streamed)</span>
+        </div>
+
+        <h3 style="margin:0 0 8px;font:600 var(--lf-fs-xs) var(--lf-font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--lf-text-muted)">Pipeline</h3>
+        <ul class="lf-stages">
+          <li><span class="st done">✓</span> Validate <span class="detail">12 ms</span></li>
+          <li><span class="st done">✓</span> Metadata <span class="detail">31 ms</span></li>
+          <li><span class="st done">✓</span> Render Backgrounds <span class="detail">38 s</span></li>
+          <li><span class="st done">✓</span> Extract Fonts <span class="detail">2.1 s · 14 fonts (2 sanitized)</span></li>
+          <li><span class="st done">✓</span> Extract Images <span class="detail">12 s · 214 images</span></li>
+          <li>
+            <span class="st run">▶</span> Extract Text
+            <div class="lf-progress" style="width:140px;margin-left:10px"><i style="width:24%"></i></div>
+            <span class="detail">p 214 / 890</span>
+          </li>
+          <li class="pending"><span class="st todo">○</span> Normalize IDM</li>
+          <li class="pending"><span class="st todo">○</span> Persist Assets</li>
+          <li class="pending"><span class="st todo">○</span> Generate CSS</li>
+          <li class="pending"><span class="st todo">○</span> Generate HTML</li>
+        </ul>
+
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--lf-border)">
+          <button class="lf-btn sm">View live log</button>
+          <span style="font-size:var(--lf-fs-xs);color:var(--lf-text-muted)">You can leave this page — progress continues.</span>
+        </div>
+      </div>
+
+      <div class="lf-card">
+        <h3>Recent imports</h3>
+        <table class="recent">
+          <tr>
+            <td><strong>Sunny Day for Max</strong></td><td>27 pages</td>
+            <td><span class="lf-badge ready">Ready</span></td>
+            <td style="color:var(--lf-text-muted)">2 min ago</td>
+            <td><button class="lf-btn primary sm">Open</button></td>
+          </tr>
+          <tr>
+            <td><strong>Annual Gov Report</strong></td><td>112 pages</td>
+            <td><span class="lf-badge failed">Failed</span></td>
+            <td style="color:var(--lf-text-muted)">1 hr ago</td>
+            <td><button class="lf-btn sm danger">Details</button></td>
+          </tr>
+        </table>
+        <div style="margin-top:10px;padding:10px;border:1px solid color-mix(in srgb, var(--lf-danger) 35%, transparent);border-radius:var(--lf-radius);font-size:var(--lf-fs-sm)">
+          <strong style="color:var(--lf-danger)">✕ Extract Fonts — failed.</strong>
+          Font "Frutiger-Cn" subset is malformed (fontTools: bad cmap table). Conversion stopped at stage 4/10.
+          <div style="margin-top:8px;display:flex;gap:6px">
+            <button class="lf-btn sm">View conversion log</button>
+            <button class="lf-btn sm">Retry</button>
+            <button class="lf-btn sm ghost">Report issue</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="lf-status">
+    <span class="seg">1 job running</span>
+    <span class="spacer"></span>
+    <span class="seg"><span class="dot"></span> backend</span>
+    <span class="seg"><span class="dot"></span> storage</span>
+    <span class="seg"><span class="dot"></span> static</span>
+    <span class="seg">API v1</span>
+  </footer>
+</div>
+
+<div class="mock-bar">
+  <a class="lf-btn sm" href="index.html">☰ All mockups</a>
+  <button class="lf-btn sm" onclick="lfToggleTheme()">◐ Theme</button>
+</div>
+</body>
+</html>

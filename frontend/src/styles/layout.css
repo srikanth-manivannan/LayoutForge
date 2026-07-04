@@ -1,0 +1,120 @@
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+.lf-app {
+  display: grid;
+  grid-template-rows: auto auto 1fr auto;
+  height: 100vh;
+}
+
+.lf-body {
+  display: grid;
+  grid-template-columns: 240px 1fr 280px;
+  overflow: hidden;
+}
+
+.lf-panel {
+  overflow-y: auto;
+  border-right: 1px solid var(--bs-border-color);
+}
+
+.lf-panel:last-child {
+  border-right: none;
+  border-left: 1px solid var(--bs-border-color);
+}
+
+.lf-preview {
+  overflow: hidden;
+  background-color: var(--lf-bg-gutter);
+}
+
+.lf-viewer-canvas {
+  background-color: var(--lf-bg-gutter);
+}
+
+.lf-viewer-page-host {
+  position: relative;
+  flex: 0 0 auto;
+  /* The document page itself — deliberately NOT themed (kept literal white,
+     matching the generated page HTML). Document colors must read true in
+     both themes. */
+  background-color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transform-origin: top center;
+}
+
+.lf-viewer-page-current {
+  outline: 2px solid var(--bs-primary);
+}
+
+/* --- Thumbnail rail (2B): windowed plain <img> thumbnails --- */
+
+.lf-thumb-rail {
+  width: 108px;
+  flex: none;
+  overflow-y: auto;
+  background: var(--lf-bg-surface);
+  border-right: 1px solid var(--lf-border);
+}
+
+.lf-thumb {
+  position: absolute;
+  left: 8px;
+  width: 92px;
+  height: 100px;
+  padding: 0;
+  border: 2px solid var(--lf-border);
+  border-radius: var(--lf-radius-sm);
+  background: #ffffff; /* thumbnail paper — document content, not themed */
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.lf-thumb:hover {
+  border-color: var(--lf-border-strong);
+}
+
+.lf-thumb:focus-visible {
+  outline: 2px solid var(--lf-accent);
+  outline-offset: 1px;
+}
+
+.lf-thumb-current {
+  border-color: var(--lf-accent);
+}
+
+.lf-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.lf-thumb-blank {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--lf-bg-sunken);
+}
+
+.lf-thumb-num {
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: var(--lf-fs-xs);
+  color: var(--lf-text-muted);
+  background: var(--lf-bg-surface);
+  padding: 0 3px;
+  border-radius: 3px;
+}
+
+.lf-log-panel {
+  height: 160px;
+  overflow-y: auto;
+  border-top: 1px solid var(--bs-border-color);
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 0.8rem;
+}

@@ -1,0 +1,170 @@
+/* components/ui/ primitive styles. Tokens only — no hard-coded values
+   (docs/design/09_DESIGN_SYSTEM.md). Classes are prefixed `lfui-` so they
+   never collide with Bootstrap or the existing shell/layout classes.
+   Reference styling: docs/design/hifi/lf-mockup.css. */
+
+/* ---------- Button / IconButton ---------- */
+
+.lfui-btn {
+  height: var(--lf-control-h);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 var(--lf-density-md);
+  font: 500 var(--lf-fs-sm) var(--lf-font-ui);
+  color: var(--lf-text);
+  background: var(--lf-bg-surface);
+  border: 1px solid var(--lf-border-strong);
+  border-radius: var(--lf-radius);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.lfui-btn:hover:not(:disabled) { background: var(--lf-bg-sunken); }
+.lfui-btn:focus-visible { outline: 2px solid var(--lf-accent); outline-offset: 1px; }
+.lfui-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.lfui-btn--primary { background: var(--lf-accent); border-color: var(--lf-accent); color: #fff; }
+.lfui-btn--primary:hover:not(:disabled) { background: var(--lf-accent); filter: brightness(1.06); }
+.lfui-btn--ghost { border-color: transparent; background: none; color: var(--lf-text-muted); }
+.lfui-btn--ghost:hover:not(:disabled) { background: var(--lf-bg-sunken); color: var(--lf-text); }
+.lfui-btn--danger { color: var(--lf-danger); border-color: var(--lf-danger); }
+
+.lfui-btn--sm { height: 24px; padding: 0 var(--lf-density-sm); font-size: var(--lf-fs-xs); }
+
+.lfui-iconbtn {
+  width: var(--lf-control-h);
+  padding: 0;
+  justify-content: center;
+}
+
+/* ---------- Badge — the ONLY way status renders ---------- */
+
+.lfui-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: 600 var(--lf-fs-xs) var(--lf-font-ui);
+  padding: 2px 8px;
+  border-radius: var(--lf-radius-sm);
+  border: 1px solid transparent;
+}
+.lfui-badge--ready,
+.lfui-badge--pass { color: var(--lf-success); background: color-mix(in srgb, var(--lf-success) 12%, transparent); }
+.lfui-badge--warning { color: var(--lf-warning); background: color-mix(in srgb, var(--lf-warning) 14%, transparent); }
+.lfui-badge--failed,
+.lfui-badge--error { color: var(--lf-danger); background: color-mix(in srgb, var(--lf-danger) 12%, transparent); }
+.lfui-badge--processing { color: var(--lf-accent); background: var(--lf-accent-subtle); }
+.lfui-badge--neutral { color: var(--lf-text-muted); background: var(--lf-bg-sunken); border-color: var(--lf-border); }
+
+/* ---------- Tabs (CenterDock style: 2px accent underline) ---------- */
+
+.lfui-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  border-bottom: 1px solid var(--lf-border);
+  background: var(--lf-bg-surface);
+}
+.lfui-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px var(--lf-density-md);
+  font: 500 var(--lf-fs-sm) var(--lf-font-ui);
+  color: var(--lf-text-muted);
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+}
+.lfui-tab:hover:not(:disabled) { color: var(--lf-text); }
+.lfui-tab:focus-visible { outline: 2px solid var(--lf-accent); outline-offset: -2px; }
+.lfui-tab--active { color: var(--lf-accent); border-bottom-color: var(--lf-accent); font-weight: 600; }
+.lfui-tab:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---------- Toolbar ---------- */
+
+.lfui-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--lf-density-sm);
+  padding: 0 var(--lf-density-md);
+  min-height: 40px;
+  background: var(--lf-bg-surface);
+  border-bottom: 1px solid var(--lf-border);
+}
+.lfui-toolbar-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--lf-border);
+  margin: 0 var(--lf-density-xs);
+  flex: none;
+}
+.lfui-toolbar-spacer { flex: 1; }
+
+/* ---------- Progress (linear, determinate, honest) ---------- */
+
+.lfui-progress {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--lf-bg-sunken);
+  border: 1px solid var(--lf-border);
+  overflow: hidden;
+}
+.lfui-progress > i {
+  display: block;
+  height: 100%;
+  background: var(--lf-accent);
+}
+
+/* ---------- Slider ---------- */
+
+.lfui-slider { display: inline-flex; align-items: center; gap: var(--lf-density-sm); }
+.lfui-slider input[type="range"] { accent-color: var(--lf-accent); }
+.lfui-slider input[type="range"]:focus-visible { outline: 2px solid var(--lf-accent); outline-offset: 2px; }
+.lfui-slider .lfui-slider-value {
+  font: 400 var(--lf-fs-xs) var(--lf-font-mono);
+  color: var(--lf-text-muted);
+  min-width: 4ch;
+}
+
+/* ---------- EmptyState (icon + one sentence + one action) ---------- */
+
+.lfui-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--lf-density-md);
+  height: 100%;
+  min-height: 120px;
+  text-align: center;
+  color: var(--lf-text-muted);
+  padding: var(--lf-density-xl);
+  font-size: var(--lf-fs-sm);
+}
+.lfui-empty-glyph { font-size: 30px; opacity: 0.6; }
+
+/* ---------- Skeleton (never spinners for content areas) ---------- */
+
+.lfui-skeleton {
+  display: block;
+  background: var(--lf-bg-sunken);
+  border-radius: var(--lf-radius-sm);
+  animation: lfui-skeleton-pulse 1.2s ease-in-out infinite;
+}
+@keyframes lfui-skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+/* ---------- Motion: fast and functional ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .lfui-btn, .lfui-tab, .lfui-badge {
+    transition: background-color 120ms ease-out, color 120ms ease-out, border-color 120ms ease-out;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lfui-skeleton { animation: none; }
+}

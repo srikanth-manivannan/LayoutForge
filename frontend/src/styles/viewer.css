@@ -1,0 +1,10 @@
+/* Viewer-specific chrome for the workspace context. The bulk of the
+   viewer's own styling (.lf-preview, .lf-viewer-canvas,
+   .lf-viewer-page-host, etc.) still lives in layout.css from Phase 1 and is
+   reused unchanged — this file only makes the existing viewer fill its new
+   resizable-panel/tab-strip container correctly. Sub-phase 2B (view modes,
+   windowing, thumbnails, search) will grow this file substantially. */
+
+.lf-center-dock-content .lf-preview {
+  height: 100%;
+}

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LayoutForge — Dashboard (hi-fi mockup)</title>
+<link rel="stylesheet" href="lf-mockup.css">
+<script src="lf-mockup.js"></script>
+<style>
+  .dash { flex:1; overflow:auto; padding:var(--lf-sp-xl); display:flex; flex-direction:column; gap:var(--lf-sp-lg); max-width:1080px; width:100%; margin:0 auto; }
+  .dash h1 { margin:0; font:600 var(--lf-fs-xl) var(--lf-font-ui); }
+  .dash .sub { color:var(--lf-text-muted); font-size:var(--lf-fs-sm); margin-top:2px; }
+  .dash-row { display:grid; grid-template-columns:3fr 2fr; gap:var(--lf-sp-lg); }
+  .sum-grid { display:grid; grid-template-columns:1fr 1fr; gap:var(--lf-sp-sm); }
+  .sum-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid var(--lf-border); border-radius:var(--lf-radius); cursor:pointer; }
+  .sum-item:hover { background:var(--lf-bg-sunken); }
+  .sum-item .n { font:600 var(--lf-fs-xl) var(--lf-font-ui); }
+  .sum-item .l { font-size:var(--lf-fs-xs); color:var(--lf-text-muted); }
+  .proj-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--lf-sp-lg); }
+  .thumb-mini { position:relative; width:74px; height:96px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.25); overflow:hidden; }
+  .thumb-mini i { position:absolute; display:block; }
+</style>
+</head>
+<body>
+<div class="lf-app">
+
+  <nav class="lf-rail" aria-label="Global navigation">
+    <button class="lf-rail-item active" title="Dashboard"><span class="glyph">⌂</span>Home</button>
+    <button class="lf-rail-item" title="Projects"><span class="glyph">▤</span>Projects</button>
+    <button class="lf-rail-item" title="Import"><span class="glyph">⇪</span>Import</button>
+    <div class="lf-rail-spacer"></div>
+    <button class="lf-rail-item" title="Settings"><span class="glyph">⚙</span>Settings</button>
+  </nav>
+
+  <div class="lf-main">
+    <div class="lf-quickbar" role="toolbar" aria-label="Quick actions">
+      <span style="font:600 var(--lf-fs-md) var(--lf-font-ui)">LayoutForge Studio</span>
+      <span class="spacer"></span>
+      <button class="lf-btn ghost">⌘K</button>
+    </div>
+
+    <div class="dash">
+      <div>
+        <h1>Good afternoon</h1>
+        <div class="sub">4 titles ready for proofing · 1 conversion in flight</div>
+      </div>
+
+      <div class="lf-dropzone" role="button" tabindex="0" aria-label="Import PDF">
+        <span class="big">⇪</span>
+        <div><strong>Drop a PDF anywhere to import</strong></div>
+        <div style="font-size:var(--lf-fs-xs)">or</div>
+        <button class="lf-btn primary">Import PDF</button>
+      </div>
+
+      <div class="dash-row">
+        <div class="lf-card">
+          <h3>Active conversion</h3>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+            <strong style="font-size:var(--lf-fs-sm)">Science Textbook Gr.4</strong>
+            <span class="lf-badge processing">Processing</span>
+            <span style="margin-left:auto;font-size:var(--lf-fs-xs);color:var(--lf-text-muted)">~3 min left</span>
+          </div>
+          <div style="font-size:var(--lf-fs-xs);color:var(--lf-text-muted);margin-bottom:6px">Stage 6 / 10 · Extract Text · page 214 / 890</div>
+          <div class="lf-progress" style="margin-bottom:12px"><i style="width:62%"></i></div>
+          <button class="lf-btn sm">View logs</button>
+          <button class="lf-btn sm">Open when ready</button>
+        </div>
+
+        <div class="lf-card">
+          <h3>Production summary</h3>
+          <div class="sum-grid">
+            <div class="sum-item"><span class="n" style="color:var(--lf-success)">4</span><span class="l">Ready</span></div>
+            <div class="sum-item"><span class="n" style="color:var(--lf-accent)">1</span><span class="l">Processing</span></div>
+            <div class="sum-item"><span class="n" style="color:var(--lf-danger)">1</span><span class="l">Failed</span></div>
+            <div class="sum-item"><span class="n">12</span><span class="l">Delivered</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:center;margin-bottom:var(--lf-sp-md)">
+          <h3 style="margin:0;font:600 var(--lf-fs-xs) var(--lf-font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--lf-text-muted)">Recent projects</h3>
+          <span style="flex:1"></span>
+          <button class="lf-btn sm ghost">All →</button>
+        </div>
+        <div class="proj-grid">
+          <div class="lf-projcard">
+            <div class="thumb"><div class="thumb-mini"><i style="inset:0 0 42% 0;background:#aee3f5"></i><i style="inset:58% 0 0 0;background:#8fd06c"></i><i style="left:14px;bottom:22px;width:30px;height:16px;background:#a9744f;border-radius:40%"></i></div></div>
+            <div class="meta">
+              <span class="name">Sunny Day for Max</span>
+              <span class="sub">27 pages <span class="lf-badge ready">Ready</span></span>
+              <button class="lf-btn primary sm">Open</button>
+            </div>
+          </div>
+          <div class="lf-projcard">
+            <div class="thumb"><div class="thumb-mini"><i style="inset:0 0 55% 0;background:#e8e2f7"></i><i style="inset:45% 8px 8px 8px;background:#f4f4f4"></i></div></div>
+            <div class="meta">
+              <span class="name">Style Monthly #48</span>
+              <span class="sub">64 pages <span class="lf-badge ready">Ready</span></span>
+              <button class="lf-btn primary sm">Open</button>
+            </div>
+          </div>
+          <div class="lf-projcard">
+            <div class="thumb"><div class="thumb-mini"><i style="inset:8px;border:1px solid #ccc"></i></div></div>
+            <div class="meta">
+              <span class="name">Annual Gov Report</span>
+              <span class="sub">112 pages <span class="lf-badge failed">Failed</span></span>
+              <button class="lf-btn sm danger">Details</button>
+            </div>
+          </div>
+          <div class="lf-projcard">
+            <div class="thumb"><div class="thumb-mini"><i style="inset:0 0 70% 0;background:#d7ecd9"></i><i style="inset:34% 10px 10px 10px;background:#fafafa"></i></div></div>
+            <div class="meta">
+              <span class="name">Science Textbook Gr.4</span>
+              <span class="sub">890 pages <span class="lf-badge processing">Processing</span></span>
+              <button class="lf-btn sm">Monitor</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="lf-status">
+    <span class="spacer"></span>
+    <span class="seg"><span class="dot"></span> backend</span>
+    <span class="seg"><span class="dot"></span> storage</span>
+    <span class="seg"><span class="dot"></span> static</span>
+    <span class="seg">API v1</span>
+  </footer>
+</div>
+
+<div class="mock-bar">
+  <a class="lf-btn sm" href="index.html">☰ All mockups</a>
+  <button class="lf-btn sm" onclick="lfToggleTheme()">◐ Theme</button>
+</div>
+</body>
+</html>

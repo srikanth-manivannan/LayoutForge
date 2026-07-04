@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LayoutForge — Workspace · Compare Mode (hi-fi mockup)</title>
+<link rel="stylesheet" href="lf-mockup.css">
+<script src="lf-mockup.js"></script>
+<style>
+  .book-sky { position:absolute; inset:0 0 38% 0; background:#aee3f5; }
+  .book-sun { position:absolute; top:28px; right:44px; width:64px; height:64px; border-radius:50%; background:#ffd23e; }
+  .book-grass { position:absolute; inset:62% 0 0 0; background:#8fd06c; }
+  .book-dog { position:absolute; left:64px; bottom:110px; width:150px; height:86px; background:#a9744f; border-radius:42% 48% 40% 40%; }
+  .book-headline { position:absolute; left:42px; top:56px; width:300px; font:700 30px/1.15 "Comic Sans MS","Segoe Print",cursive; color:#20406b; }
+  .book-caption { position:absolute; left:42px; bottom:40px; width:340px; font:400 15px/1.4 Georgia,serif; color:#333; }
+  /* the reconstruction overlay at 60% — small drift on the headline makes ghosting visible */
+  .overlay-layer { position:absolute; inset:0; opacity:.6; }
+  .overlay-layer .book-headline { left:45px; top:59px; color:#1b3a63; }
+  .seg-toggle { display:inline-flex; border:1px solid var(--lf-border-strong); border-radius:var(--lf-radius); overflow:hidden; }
+  .seg-toggle button { border:0; background:var(--lf-bg-surface); color:var(--lf-text-muted); font:500 var(--lf-fs-sm) var(--lf-font-ui); height:26px; padding:0 12px; cursor:pointer; }
+  .seg-toggle button.on { background:var(--lf-accent); color:#fff; }
+</style>
+</head>
+<body>
+<div class="lf-app">
+
+  <nav class="lf-rail" aria-label="Global navigation">
+    <button class="lf-rail-item" title="Dashboard"><span class="glyph">⌂</span>Home</button>
+    <button class="lf-rail-item" title="Projects"><span class="glyph">▤</span>Projects</button>
+    <button class="lf-rail-item" title="Import"><span class="glyph">⇪</span>Import</button>
+    <div class="lf-rail-sep"></div>
+    <button class="lf-rail-item" title="Viewer"><span class="glyph">◉</span>Proof</button>
+    <button class="lf-rail-item active" title="Compare"><span class="glyph">⧉</span>Compare</button>
+    <button class="lf-rail-item" title="Validation"><span class="glyph">✓</span>Validate</button>
+    <button class="lf-rail-item" title="Logs"><span class="glyph">≣</span>Logs</button>
+    <div class="lf-rail-spacer"></div>
+    <button class="lf-rail-item" title="Settings"><span class="glyph">⚙</span>Settings</button>
+  </nav>
+
+  <div class="lf-main">
+
+    <div class="lf-quickbar" role="toolbar" aria-label="Quick actions">
+      <button class="lf-btn ghost">⇪ Import</button>
+      <button class="lf-btn ghost" style="color:var(--lf-accent)">⧉ Compare</button>
+      <button class="lf-btn ghost">✓ Validate</button>
+      <button class="lf-btn ghost" disabled title="Phase 5">♿ A11y</button>
+      <button class="lf-btn ghost" disabled title="Phase 4">⇓ Export</button>
+      <span class="spacer"></span>
+      <input class="lf-input" style="width:200px" placeholder="🔍 Search document (Ctrl+F)">
+      <button class="lf-btn ghost">⌘K</button>
+    </div>
+
+    <div class="lf-workspace">
+
+      <aside class="lf-dock left">
+        <div class="lf-panel-header">Explorer</div>
+        <div class="lf-panel-body">
+          <ul class="lf-tree">
+            <li><span class="chev">▾</span><strong>Sunny Day for Max</strong></li>
+            <li class="nested"><span class="chev">▸</span> Source <span class="count">source.pdf</span></li>
+            <li class="nested"><span class="chev">▸</span> Pages <span class="count">27</span></li>
+            <li class="nested"><span class="chev">▸</span> Fonts <span class="count">5</span></li>
+            <li class="nested"><span class="chev">▸</span> Images <span class="count">40</span></li>
+            <li class="nested"><span class="chev">▸</span> CSS <span class="count">28</span></li>
+            <li class="nested"><span class="chev">▸</span> Output <span class="count">HTML</span></li>
+            <li class="nested"><span class="chev">▸</span> Reports <span class="count">—</span></li>
+          </ul>
+        </div>
+      </aside>
+      <div class="lf-resize-h"></div>
+
+      <div class="lf-center">
+        <div class="lf-modes" role="tablist" aria-label="Workspace modes">
+          <button class="lf-mode" role="tab">Proof</button>
+          <button class="lf-mode active" role="tab" aria-selected="true">Compare</button>
+          <button class="lf-mode" role="tab">Validate</button>
+          <button class="lf-mode" role="tab" disabled title="Phase 3">Edit</button>
+          <button class="lf-mode" role="tab" disabled title="Phase 5">A11y</button>
+          <button class="lf-mode" role="tab" disabled title="Phase 4">Export</button>
+        </div>
+
+        <div class="lf-mode-toolbar" role="toolbar" aria-label="Compare tools">
+          <span class="seg-toggle" role="group" aria-label="Compare layout">
+            <button class="on">Overlay</button><button>Split</button>
+          </span>
+          <span class="sep"></span>
+          <button class="lf-btn sm ghost" title="Previous page">◀</button>
+          <input class="lf-input lf-page-field" value="12" aria-label="Page"> <span style="color:var(--lf-text-muted);font-size:var(--lf-fs-sm)">/ 27</span>
+          <button class="lf-btn sm ghost" title="Next page">▶</button>
+          <span class="sep"></span>
+          <span class="lf-slider">
+            <span style="font-size:var(--lf-fs-xs);color:var(--lf-text-muted)">Overlay opacity</span>
+            <input type="range" min="0" max="100" value="60" aria-label="Overlay opacity">
+            <span style="font-family:var(--lf-font-mono);font-size:var(--lf-fs-xs)">60%</span>
+          </span>
+          <span class="sep"></span>
+          <label style="display:inline-flex;align-items:center;gap:6px;font-size:var(--lf-fs-sm);color:var(--lf-text-muted)">
+            <input type="checkbox"> Difference emphasis
+          </label>
+          <span class="spacer"></span>
+          <span style="font-size:var(--lf-fs-xs)">base <select class="lf-select" style="height:24px"><option>Source raster</option><option>Reconstruction</option><option>Background only</option><option>Overlay only</option></select></span>
+          <span style="font-size:var(--lf-fs-xs)">over <select class="lf-select" style="height:24px"><option>Reconstruction</option><option>Source raster</option></select></span>
+          <button class="lf-btn sm ghost" title="Swap layers">⇆</button>
+        </div>
+
+        <div class="lf-gutter">
+          <div class="lf-page" role="img" aria-label="Compare overlay, page 12">
+            <!-- base: source raster -->
+            <div class="book-sky"></div><div class="book-sun"></div><div class="book-grass"></div><div class="book-dog"></div>
+            <div class="book-headline">Max ran home — fast!</div>
+            <div class="book-caption">The rain was coming, and Max knew exactly where he wanted to be: curled up on his warm red blanket by the door.</div>
+            <!-- overlay: reconstruction @ 60%, headline drifted +3,+3 → ghosting -->
+            <div class="overlay-layer" aria-hidden="true">
+              <div class="book-headline">Max ran home — fast!</div>
+              <div class="book-caption">The rain was coming, and Max knew exactly where he wanted to be: curled up on his warm red blanket by the door.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lf-bottomdock">
+          <div class="tabs">
+            <button class="tab active">Job log</button>
+            <button class="tab">Application</button>
+            <button class="tab">Conversion</button>
+            <button class="tab">Performance</button>
+            <span style="flex:1"></span>
+            <button class="lf-btn sm ghost" title="Collapse (Ctrl+J)">▾</button>
+          </div>
+          <pre class="lf-log"><span class="t">12:06:02</span> <span class="stage">[CMP]</span>  overlay mode · base=source raster · over=reconstruction @ 60%</pre>
+        </div>
+      </div>
+
+      <div class="lf-resize-h"></div>
+      <aside class="lf-dock right">
+        <div class="lf-panel-header">Properties <span style="margin-left:auto" class="lf-badge neutral">TextBlock</span></div>
+        <div class="lf-panel-body">
+          <div class="lf-propgroup">
+            <div class="head">▾ Geometry</div>
+            <div class="rows">
+              <div class="lf-proprow"><span class="k">x</span><span class="v">84.0</span></div>
+              <div class="lf-proprow"><span class="k">y</span><span class="v">210.4</span></div>
+              <div class="lf-proprow"><span class="k">width</span><span class="v">412.6</span></div>
+              <div class="lf-proprow"><span class="k">height</span><span class="v">56.0</span></div>
+            </div>
+          </div>
+          <div class="lf-propgroup">
+            <div class="head">▾ Typography</div>
+            <div class="rows">
+              <div class="lf-proprow"><span class="k">font</span><span class="v link">KidstuffBold (subset)</span></div>
+              <div class="lf-proprow"><span class="k">size</span><span class="v">24.0 pt</span></div>
+            </div>
+          </div>
+          <div class="lf-propgroup"><div class="head">▸ Appearance</div></div>
+          <div class="lf-propgroup"><div class="head">▸ Metadata</div></div>
+          <div class="lf-propgroup"><div class="head">▸ Advanced</div></div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <footer class="lf-status">
+    <span class="seg"><strong>Sunny Day for Max</strong></span>
+    <span class="seg">p 12 / 27</span>
+    <span class="seg">150%</span>
+    <span class="seg">1 selected · TextBlock</span>
+    <span class="spacer"></span>
+    <span class="seg"><span class="dot"></span> backend</span>
+    <span class="seg"><span class="dot"></span> storage</span>
+    <span class="seg"><span class="dot"></span> static</span>
+    <span class="seg">API v1</span>
+  </footer>
+</div>
+
+<div class="mock-bar">
+  <a class="lf-btn sm" href="index.html">☰ All mockups</a>
+  <button class="lf-btn sm" onclick="lfToggleTheme()">◐ Theme</button>
+</div>
+</body>
+</html>

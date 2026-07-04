@@ -1,0 +1,3 @@
+- Read docs
+- Implement phase
+- Test

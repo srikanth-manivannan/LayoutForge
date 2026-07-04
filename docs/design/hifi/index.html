@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LayoutForge Studio — High-Fidelity Mockups</title>
+<link rel="stylesheet" href="lf-mockup.css">
+<script src="lf-mockup.js"></script>
+<style>
+  .idx { max-width:760px; margin:0 auto; padding:var(--lf-sp-xl); }
+  .idx h1 { font:600 var(--lf-fs-xl) var(--lf-font-ui); margin:0 0 4px; }
+  .idx .sub { color:var(--lf-text-muted); font-size:var(--lf-fs-sm); margin-bottom:var(--lf-sp-xl); }
+  .idx a.item {
+    display:flex; align-items:center; gap:12px;
+    padding:14px 16px; margin-bottom:10px;
+    background:var(--lf-bg-surface); border:1px solid var(--lf-border);
+    border-radius:var(--lf-radius-lg); box-shadow:var(--lf-shadow-panel);
+    color:var(--lf-text); text-decoration:none;
+  }
+  .idx a.item:hover { border-color:var(--lf-accent); }
+  .idx .n { width:26px; height:26px; border-radius:50%; background:var(--lf-accent-subtle); color:var(--lf-accent); font:700 13px/26px var(--lf-font-ui); text-align:center; flex:none; }
+  .idx .d { font-size:var(--lf-fs-xs); color:var(--lf-text-muted); margin-left:auto; }
+</style>
+</head>
+<body>
+<div class="idx">
+  <h1>LayoutForge Studio — High-Fidelity Mockups</h1>
+  <div class="sub">Phase 2A design deliverables · design system tokens · light + dark (toggle bottom-right on every screen) · production icons will be Lucide</div>
+
+  <a class="item" href="workspace-proof.html"><span class="n">1</span> Workspace — Proof Mode <span class="d">the flagship</span></a>
+  <a class="item" href="workspace-compare.html"><span class="n">2</span> Workspace — Compare Mode <span class="d">overlay @ 60%, drift visible</span></a>
+  <a class="item" href="workspace-validation.html"><span class="n">3</span> Workspace — Validation Mode <span class="d">2 warnings on the reference title</span></a>
+  <a class="item" href="workspace-accessibility.html"><span class="n">4</span> Workspace — Accessibility Mode <span class="d">Phase 5 preview</span></a>
+  <a class="item" href="dashboard.html"><span class="n">5</span> Dashboard <span class="d">the launcher</span></a>
+  <a class="item" href="import-center.html"><span class="n">6</span> Import Center <span class="d">pipeline truth + failure state</span></a>
+</div>
+
+<div class="mock-bar">
+  <button class="lf-btn sm" onclick="lfToggleTheme()">◐ Theme</button>
+</div>
+</body>
+</html>

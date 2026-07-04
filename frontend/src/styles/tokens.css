@@ -1,0 +1,103 @@
+/* Design tokens for the Production Publishing Workspace: a desktop-density
+   theme layered on top of Bootstrap 5 (CSS-only — no Bootstrap JS bundle is
+   used). `--lf-*` are LayoutForge-specific tokens; the `--bs-*` overrides
+   keep Bootstrap utility classes (badges, buttons, tables, alerts) visually
+   consistent with them without needing a Sass rebuild.
+
+   This file is the SINGLE source of truth for color/space/radius/type
+   values (docs/design/09_DESIGN_SYSTEM.md). Components never hard-code hex
+   values. Dark theme is a token swap under [data-lf-theme="dark"] — never a
+   component fork. The document canvas gutter (--lf-bg-gutter) stays
+   neutral-dark in BOTH themes so document colors read true; the rendered
+   page itself is never themed. */
+
+:root {
+  /* Neutrals (light) */
+  --lf-bg-canvas: #eef0f3;
+  --lf-bg-surface: #ffffff;
+  --lf-bg-sunken: #f7f8fa;
+  --lf-border: #dde1e6;
+  --lf-border-strong: #c7ccd3;
+  --lf-text: #1f2328;
+  --lf-text-muted: #5b6470;
+
+  /* Accent + semantics (status taxonomy — the only status colors) */
+  --lf-accent: #2f6fed;
+  --lf-accent-subtle: #e8f0fe;
+  --lf-danger: #d1373f;
+  --lf-warning: #b8791a;
+  --lf-success: #1f8a52;
+  --lf-selection-outline: var(--lf-accent);
+  --lf-compare-diff: #c026d3;
+
+  /* Document gutter — neutral-dark in both themes (Acrobat/Figma convention) */
+  --lf-bg-gutter: #4b4f55;
+
+  /* Typography */
+  --lf-font-ui: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --lf-font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --lf-fs-xs: 11px;
+  --lf-fs-sm: 12.25px;
+  --lf-fs-md: 14px;
+  --lf-fs-lg: 16px;
+  --lf-fs-xl: 20px;
+
+  /* Layout metrics */
+  --lf-nav-rail-width: 64px;
+  --lf-control-h: 28px;
+  --lf-panel-header-h: 32px;
+  --lf-tree-row-h: 24px;
+
+  /* Spacing (4px base) */
+  --lf-density-xs: 0.25rem;
+  --lf-density-sm: 0.5rem;
+  --lf-density-md: 0.75rem;
+  --lf-density-lg: 1rem;
+  --lf-density-xl: 1.5rem;
+
+  /* Radius scale: sm = dense controls, default = buttons/tabs, lg = cards/overlays */
+  --lf-radius-sm: 4px;
+  --lf-radius: 6px;
+  --lf-radius-lg: 8px;
+
+  /* Elevation — flat by default; panel for docks, overlay for palette/menus/toasts */
+  --lf-shadow-panel: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --lf-shadow-overlay: 0 8px 24px rgba(15, 23, 42, 0.18);
+}
+
+[data-lf-theme="dark"] {
+  --lf-bg-canvas: #16181d;
+  --lf-bg-surface: #1f2229;
+  --lf-bg-sunken: #14161a;
+  --lf-border: #31353d;
+  --lf-border-strong: #454a54;
+  --lf-text: #e6e8eb;
+  --lf-text-muted: #9aa2ad;
+  --lf-accent-subtle: #1c2b4a;
+  --lf-bg-gutter: #101114;
+  --lf-shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --lf-shadow-overlay: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+
+/* Bootstrap variable bridge — identical mapping in both themes; the values
+   resolve differently because the --lf-* tokens swap. The theme service
+   keeps data-bs-theme in sync with data-lf-theme so Bootstrap's own
+   dark-mode component rules also engage. */
+[data-bs-theme="light"],
+[data-bs-theme="dark"] {
+  --bs-body-bg: var(--lf-bg-canvas);
+  --bs-body-color: var(--lf-text);
+  --bs-border-color: var(--lf-border);
+  --bs-primary: var(--lf-accent);
+  --bs-primary-rgb: 47, 111, 237;
+  --bs-secondary-bg: var(--lf-bg-sunken);
+  --bs-tertiary-bg: var(--lf-bg-sunken);
+}
+
+body {
+  font-size: 0.875rem;
+}
+
+.text-muted {
+  color: var(--lf-text-muted) !important;
+}

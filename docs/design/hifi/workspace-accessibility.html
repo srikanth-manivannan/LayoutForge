@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LayoutForge — Workspace · Accessibility Mode (hi-fi mockup, Phase 5 preview)</title>
+<link rel="stylesheet" href="lf-mockup.css">
+<script src="lf-mockup.js"></script>
+<style>
+  .book-sky { position:absolute; inset:0 0 38% 0; background:#aee3f5; }
+  .book-sun { position:absolute; top:28px; right:44px; width:64px; height:64px; border-radius:50%; background:#ffd23e; }
+  .book-grass { position:absolute; inset:62% 0 0 0; background:#8fd06c; }
+  .book-dog { position:absolute; left:64px; bottom:110px; width:150px; height:86px; background:#a9744f; border-radius:42% 48% 40% 40%; }
+  .book-headline { position:absolute; left:42px; top:56px; width:300px; font:700 30px/1.15 "Comic Sans MS","Segoe Print",cursive; color:#20406b; }
+  .book-caption { position:absolute; left:42px; bottom:40px; width:340px; font:400 15px/1.4 Georgia,serif; color:#333; }
+  /* Reading-order overlay: operator-invoked, toggle R */
+  .ro-badge {
+    position:absolute; width:22px; height:22px; border-radius:50%;
+    background:var(--lf-accent); color:#fff;
+    font:700 12px/22px var(--lf-font-ui); text-align:center;
+    box-shadow:0 1px 4px rgba(0,0,0,.35);
+  }
+  .ro-badge.warn { background:var(--lf-warning); }
+  .ro-list { list-style:none; margin:0; padding:var(--lf-sp-sm) 0; font-size:var(--lf-fs-sm); }
+  .ro-list li { display:flex; align-items:center; gap:8px; height:30px; padding:0 var(--lf-sp-md); cursor:pointer; }
+  .ro-list li:hover { background:var(--lf-bg-sunken); }
+  .ro-list li.selected { background:var(--lf-accent-subtle); color:var(--lf-accent); }
+  .ro-list .n { width:20px; height:20px; border-radius:50%; background:var(--lf-accent); color:#fff; font:700 11px/20px var(--lf-font-ui); text-align:center; flex:none; }
+  .ro-list li.warn .n { background:var(--lf-warning); }
+  .alt-editor textarea {
+    width:100%; min-height:72px; resize:vertical;
+    font:400 var(--lf-fs-sm)/1.5 var(--lf-font-ui); color:var(--lf-text);
+    background:var(--lf-bg-sunken); border:1px solid var(--lf-border);
+    border-radius:var(--lf-radius-sm); padding:8px;
+  }
+  .a11y-strip { display:flex; align-items:center; gap:var(--lf-sp-lg); padding:var(--lf-sp-sm) var(--lf-sp-md); border-top:1px solid var(--lf-border); background:var(--lf-bg-surface); font-size:var(--lf-fs-sm); }
+</style>
+</head>
+<body>
+<div class="lf-app">
+
+  <nav class="lf-rail" aria-label="Global navigation">
+    <button class="lf-rail-item" title="Dashboard"><span class="glyph">⌂</span>Home</button>
+    <button class="lf-rail-item" title="Projects"><span class="glyph">▤</span>Projects</button>
+    <button class="lf-rail-item" title="Import"><span class="glyph">⇪</span>Import</button>
+    <div class="lf-rail-sep"></div>
+    <button class="lf-rail-item" title="Viewer"><span class="glyph">◉</span>Proof</button>
+    <button class="lf-rail-item" title="Compare"><span class="glyph">⧉</span>Compare</button>
+    <button class="lf-rail-item" title="Validation"><span class="glyph">✓</span>Validate</button>
+    <button class="lf-rail-item active" title="Accessibility"><span class="glyph">♿</span>A11y</button>
+    <div class="lf-rail-spacer"></div>
+    <button class="lf-rail-item" title="Settings"><span class="glyph">⚙</span>Settings</button>
+  </nav>
+
+  <div class="lf-main">
+
+    <div class="lf-quickbar" role="toolbar" aria-label="Quick actions">
+      <button class="lf-btn ghost">⇪ Import</button>
+      <button class="lf-btn ghost">⧉ Compare</button>
+      <button class="lf-btn ghost">✓ Validate</button>
+      <button class="lf-btn ghost" style="color:var(--lf-accent)">♿ A11y</button>
+      <button class="lf-btn ghost" disabled title="Phase 4">⇓ Export</button>
+      <span class="spacer"></span>
+      <input class="lf-input" style="width:200px" placeholder="🔍 Search document (Ctrl+F)">
+      <button class="lf-btn ghost">⌘K</button>
+    </div>
+
+    <div class="lf-workspace">
+
+      <aside class="lf-dock left" style="width:240px">
+        <div class="lf-panel-header">Reading order · p 12 <span style="margin-left:auto"><span class="lf-kbd">R</span></span></div>
+        <div class="lf-panel-body">
+          <ul class="ro-list" aria-label="Reading order, page 12">
+            <li><span class="n">1</span> Heading — "Max ran home — fast!"</li>
+            <li class="warn selected"><span class="n">2</span> Image — dog ⚠ no alt</li>
+            <li><span class="n">3</span> Image — sun <span style="margin-left:auto;font-size:var(--lf-fs-xs);color:var(--lf-text-muted)">decorative</span></li>
+            <li><span class="n">4</span> Body — "The rain was coming…"</li>
+          </ul>
+          <div style="padding:var(--lf-sp-sm) var(--lf-sp-md);display:flex;gap:6px">
+            <button class="lf-btn sm">↑ Move up</button>
+            <button class="lf-btn sm">↓ Move down</button>
+          </div>
+          <div style="padding:0 var(--lf-sp-md);font-size:var(--lf-fs-xs);color:var(--lf-text-muted)">drag to reorder · <span class="lf-kbd">Alt+↑/↓</span> · every move is undoable</div>
+        </div>
+      </aside>
+      <div class="lf-resize-h"></div>
+
+      <div class="lf-center">
+        <div class="lf-modes" role="tablist" aria-label="Workspace modes">
+          <button class="lf-mode" role="tab">Proof</button>
+          <button class="lf-mode" role="tab">Compare</button>
+          <button class="lf-mode" role="tab">Validate</button>
+          <button class="lf-mode" role="tab" disabled title="Phase 3">Edit</button>
+          <button class="lf-mode active" role="tab" aria-selected="true">A11y</button>
+          <button class="lf-mode" role="tab" disabled title="Phase 4">Export</button>
+        </div>
+
+        <div class="lf-mode-toolbar" role="toolbar" aria-label="Accessibility tools">
+          <button class="lf-btn sm ghost" title="Previous page">◀</button>
+          <input class="lf-input lf-page-field" value="12" aria-label="Page"> <span style="color:var(--lf-text-muted);font-size:var(--lf-fs-sm)">/ 27</span>
+          <button class="lf-btn sm ghost" title="Next page">▶</button>
+          <span class="sep"></span>
+          <label style="display:inline-flex;align-items:center;gap:6px;font-size:var(--lf-fs-sm);color:var(--lf-text-muted)">
+            <input type="checkbox" checked> Reading-order overlay
+          </label>
+          <span class="sep"></span>
+          <button class="lf-btn sm">✓ Confirm page order</button>
+          <span class="spacer"></span>
+          <button class="lf-btn sm">Generate conformance report</button>
+        </div>
+
+        <div class="lf-gutter">
+          <div class="lf-page" role="img" aria-label="Page 12 with reading-order overlay">
+            <div class="book-sky"></div><div class="book-sun"></div><div class="book-grass"></div><div class="book-dog"></div>
+            <div class="book-headline">Max ran home — fast!</div>
+            <div class="book-caption">The rain was coming, and Max knew exactly where he wanted to be: curled up on his warm red blanket by the door.</div>
+            <span class="ro-badge" style="left:24px;top:52px">1</span>
+            <span class="ro-badge warn" style="left:48px;bottom:180px">2</span>
+            <span class="ro-badge" style="right:96px;top:24px">3</span>
+            <span class="ro-badge" style="left:24px;bottom:88px">4</span>
+          </div>
+        </div>
+
+        <div class="a11y-strip">
+          <span class="lf-badge warning">⚠ 3 images missing alt</span>
+          <span class="lf-badge pass">✓ order confirmed 11 / 27</span>
+          <span style="flex:1"></span>
+          <div class="lf-progress" style="width:180px" aria-label="Remediation progress"><i style="width:41%"></i></div>
+          <span style="font-size:var(--lf-fs-xs);color:var(--lf-text-muted)">11 / 27 pages</span>
+        </div>
+
+        <div class="lf-bottomdock">
+          <div class="tabs">
+            <button class="tab active">Job log</button>
+            <button class="tab">Application</button>
+            <button class="tab">Conversion</button>
+            <button class="tab">Performance</button>
+            <span style="flex:1"></span>
+            <button class="lf-btn sm ghost" title="Collapse (Ctrl+J)">▾</button>
+          </div>
+          <pre class="lf-log"><span class="t">12:11:32</span> <span class="stage">[A11Y]</span> reading order confirmed · pages 1–11</pre>
+        </div>
+      </div>
+
+      <div class="lf-resize-h"></div>
+      <aside class="lf-dock right">
+        <div class="lf-panel-header">Alt text <span style="margin-left:auto" class="lf-badge neutral">Image</span></div>
+        <div class="lf-panel-body alt-editor" style="padding:var(--lf-sp-md)">
+          <div style="height:96px;border:1px solid var(--lf-border);border-radius:var(--lf-radius-sm);margin-bottom:var(--lf-sp-md);background:#aee3f5;position:relative;overflow:hidden">
+            <i style="position:absolute;left:26px;bottom:14px;width:64px;height:36px;background:#a9744f;border-radius:42% 48% 40% 40%;display:block"></i>
+          </div>
+          <div class="lf-proprow" style="margin-bottom:6px"><span class="k">object</span><span class="v">img-4b2a…</span></div>
+          <label style="font:600 var(--lf-fs-xs) var(--lf-font-ui);color:var(--lf-text-muted);display:block;margin-bottom:4px">ALT TEXT</label>
+          <textarea aria-label="Alt text">A brown dog runs across a green field under a sunny sky.</textarea>
+          <div style="display:flex;gap:6px;margin-top:8px">
+            <button class="lf-btn sm">✦ AI draft</button>
+            <span style="flex:1"></span>
+            <label style="font-size:var(--lf-fs-xs);color:var(--lf-text-muted);display:inline-flex;align-items:center;gap:4px"><input type="checkbox"> Decorative</label>
+          </div>
+          <div style="font-size:var(--lf-fs-xs);color:var(--lf-text-muted);margin-top:6px">AI drafts are suggestions — nothing ships without your review.</div>
+          <div style="margin-top:10px"><button class="lf-btn primary sm">Save</button></div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <footer class="lf-status">
+    <span class="seg"><strong>Sunny Day for Max</strong></span>
+    <span class="seg">p 12 / 27</span>
+    <span class="seg">150%</span>
+    <span class="seg">1 selected · Image</span>
+    <span class="spacer"></span>
+    <span class="seg"><span class="dot"></span> backend</span>
+    <span class="seg"><span class="dot"></span> storage</span>
+    <span class="seg"><span class="dot"></span> static</span>
+    <span class="seg">API v1</span>
+  </footer>
+</div>
+
+<div class="mock-bar">
+  <a class="lf-btn sm" href="index.html">☰ All mockups</a>
+  <button class="lf-btn sm" onclick="lfToggleTheme()">◐ Theme</button>
+</div>
+</body>
+</html>

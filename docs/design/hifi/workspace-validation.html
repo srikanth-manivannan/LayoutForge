@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>LayoutForge — Workspace · Validation Mode (hi-fi mockup)</title>
+<link rel="stylesheet" href="lf-mockup.css">
+<script src="lf-mockup.js"></script>
+<style>
+  .val-summary { display:flex; align-items:center; gap:var(--lf-sp-lg); padding:var(--lf-sp-sm) var(--lf-sp-md); border-bottom:1px solid var(--lf-border); background:var(--lf-bg-surface); font-size:var(--lf-fs-sm); }
+  .val-detail { border-top:1px solid var(--lf-border); background:var(--lf-bg-surface); padding:var(--lf-sp-md); font-size:var(--lf-fs-sm); }
+  .val-detail h4 { margin:0 0 6px; font:600 var(--lf-fs-sm) var(--lf-font-ui); display:flex; align-items:center; gap:8px; }
+  .val-detail p { margin:0 0 10px; color:var(--lf-text-muted); line-height:1.5; }
+  .val-detail .affected { font-family:var(--lf-font-mono); font-size:var(--lf-fs-xs); background:var(--lf-bg-sunken); border:1px solid var(--lf-border); border-radius:var(--lf-radius-sm); padding:6px 8px; margin-bottom:10px; }
+</style>
+</head>
+<body>
+<div class="lf-app">
+
+  <nav class="lf-rail" aria-label="Global navigation">
+    <button class="lf-rail-item" title="Dashboard"><span class="glyph">⌂</span>Home</button>
+    <button class="lf-rail-item" title="Projects"><span class="glyph">▤</span>Projects</button>
+    <button class="lf-rail-item" title="Import"><span class="glyph">⇪</span>Import</button>
+    <div class="lf-rail-sep"></div>
+    <button class="lf-rail-item" title="Viewer"><span class="glyph">◉</span>Proof</button>
+    <button class="lf-rail-item" title="Compare"><span class="glyph">⧉</span>Compare</button>
+    <button class="lf-rail-item active" title="Validation"><span class="glyph">✓</span>Validate</button>
+    <button class="lf-rail-item" title="Logs"><span class="glyph">≣</span>Logs</button>
+    <div class="lf-rail-spacer"></div>
+    <button class="lf-rail-item" title="Settings"><span class="glyph">⚙</span>Settings</button>
+  </nav>
+
+  <div class="lf-main">
+
+    <div class="lf-quickbar" role="toolbar" aria-label="Quick actions">
+      <button class="lf-btn ghost">⇪ Import</button>
+      <button class="lf-btn ghost">⧉ Compare</button>
+      <button class="lf-btn ghost" style="color:var(--lf-accent)">✓ Validate</button>
+      <button class="lf-btn ghost" disabled title="Phase 5">♿ A11y</button>
+      <button class="lf-btn ghost" disabled title="Phase 4">⇓ Export</button>
+      <span class="spacer"></span>
+      <input class="lf-input" style="width:200px" placeholder="🔍 Search document (Ctrl+F)">
+      <button class="lf-btn ghost">⌘K</button>
+    </div>
+
+    <div class="lf-workspace">
+
+      <aside class="lf-dock left">
+        <div class="lf-panel-header">Explorer</div>
+        <div class="lf-panel-body">
+          <ul class="lf-tree">
+            <li><span class="chev">▾</span><strong>Sunny Day for Max</strong></li>
+            <li class="nested"><span class="chev">▸</span> Source <span class="count">source.pdf</span></li>
+            <li class="nested"><span class="chev">▸</span> Pages <span class="count">27</span></li>
+            <li class="nested"><span class="chev">▸</span> Fonts <span class="count">5</span></li>
+            <li class="nested"><span class="chev">▸</span> Images <span class="count">40</span></li>
+            <li class="nested"><span class="chev">▸</span> CSS <span class="count">28</span></li>
+            <li class="nested"><span class="chev">▸</span> Output <span class="count">HTML</span></li>
+            <li class="nested selected"><span class="chev">▾</span> Reports <span class="count">1</span></li>
+            <li class="nested" style="padding-left:44px">Validation <span class="count"><span class="lf-badge warning">2 ⚠</span></span></li>
+          </ul>
+        </div>
+      </aside>
+      <div class="lf-resize-h"></div>
+
+      <div class="lf-center">
+        <div class="lf-modes" role="tablist" aria-label="Workspace modes">
+          <button class="lf-mode" role="tab">Proof</button>
+          <button class="lf-mode" role="tab">Compare</button>
+          <button class="lf-mode active" role="tab" aria-selected="true">Validate</button>
+          <button class="lf-mode" role="tab" disabled title="Phase 3">Edit</button>
+          <button class="lf-mode" role="tab" disabled title="Phase 5">A11y</button>
+          <button class="lf-mode" role="tab" disabled title="Phase 4">Export</button>
+        </div>
+
+        <div class="lf-mode-toolbar" role="toolbar" aria-label="Validation tools">
+          <button class="lf-btn primary sm">▶ Run all</button>
+          <button class="lf-btn sm">↻ Re-run changed</button>
+          <span class="sep"></span>
+          <label style="font-size:var(--lf-fs-sm);color:var(--lf-text-muted)"><input type="checkbox" checked> Layout</label>
+          <label style="font-size:var(--lf-fs-sm);color:var(--lf-text-muted)"><input type="checkbox" checked> Assets</label>
+          <label style="font-size:var(--lf-fs-sm);color:var(--lf-text-muted)"><input type="checkbox" checked> Links</label>
+          <label style="font-size:var(--lf-fs-sm);color:var(--lf-text-muted)"><input type="checkbox" checked> Structure</label>
+          <span class="spacer"></span>
+          <span style="font-size:var(--lf-fs-xs);color:var(--lf-text-muted)">last run 12:07 · 6.2 s</span>
+        </div>
+
+        <div class="val-summary">
+          <span class="lf-badge pass">✓ 25 pass</span>
+          <span class="lf-badge warning">⚠ 2 warnings</span>
+          <span class="lf-badge neutral">✕ 0 errors</span>
+          <span style="flex:1"></span>
+          <div class="lf-progress" style="width:180px" aria-label="Validation progress"><i style="width:100%"></i></div>
+          <span style="font-size:var(--lf-fs-xs);color:var(--lf-text-muted)">27 / 27 pages</span>
+        </div>
+
+        <div class="lf-panel-body" style="background:var(--lf-bg-surface)">
+          <table class="lf-table" aria-label="Validation findings">
+            <thead><tr><th style="width:60px">Sev</th><th style="width:60px">Page</th><th style="width:120px">Object</th><th>Message</th></tr></thead>
+            <tbody>
+              <tr class="selected">
+                <td><span class="lf-badge warning">⚠</span></td><td>12</td>
+                <td class="mono">tb-8f3a…</td>
+                <td>Missing glyph U+2014 in embedded subset "KidstuffBold"</td>
+              </tr>
+              <tr>
+                <td><span class="lf-badge warning">⚠</span></td><td>19</td>
+                <td class="mono">tb-2c91…</td>
+                <td>Font fallback risk: subset failed OTS pre-check before sanitization</td>
+              </tr>
+              <tr style="cursor:default">
+                <td colspan="4" style="color:var(--lf-text-muted);font-size:var(--lf-fs-xs)">pages 1–11, 13–18, 20–27 · all checks pass</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="val-detail" aria-label="Finding detail">
+          <h4><span class="lf-badge warning">⚠ Warning</span> Missing glyph · page 12 · <span style="font-family:var(--lf-font-mono);font-weight:400">tb-8f3a…</span></h4>
+          <p>Glyph U+2014 (em dash) is absent from the embedded subset "KidstuffBold".
+             The browser will substitute from a fallback font, which may shift metrics on this line.</p>
+          <div class="affected">"…Max ran home — fast!"</div>
+          <button class="lf-btn primary sm">Go to object</button>
+          <button class="lf-btn sm">Ignore…</button>
+          <button class="lf-btn sm ghost">Copy details</button>
+          <span style="float:right;font-size:var(--lf-fs-xs);color:var(--lf-text-muted)"><span class="lf-kbd">F8</span> next finding</span>
+        </div>
+
+        <div class="lf-bottomdock">
+          <div class="tabs">
+            <button class="tab active">Job log</button>
+            <button class="tab">Application</button>
+            <button class="tab">Conversion</button>
+            <button class="tab">Performance</button>
+            <span style="flex:1"></span>
+            <button class="lf-btn sm ghost" title="Collapse (Ctrl+J)">▾</button>
+          </div>
+          <pre class="lf-log"><span class="t">12:07:11</span> <span class="stage">[VAL]</span>  run complete · 27 pages · 25 pass · 2 warnings · 0 errors · 6.2 s (worker)</pre>
+        </div>
+      </div>
+
+      <div class="lf-resize-h"></div>
+      <aside class="lf-dock right">
+        <div class="lf-panel-header">Properties <span style="margin-left:auto" class="lf-badge neutral">TextBlock</span></div>
+        <div class="lf-panel-body">
+          <div class="lf-propgroup">
+            <div class="head">▾ Typography</div>
+            <div class="rows">
+              <div class="lf-proprow"><span class="k">font</span><span class="v link">KidstuffBold (subset)</span></div>
+              <div class="lf-proprow"><span class="k">size</span><span class="v">24.0 pt</span></div>
+              <div class="lf-proprow"><span class="k">sanitized</span><span class="v">yes (fontTools)</span></div>
+            </div>
+          </div>
+          <div class="lf-propgroup">
+            <div class="head">▾ Geometry</div>
+            <div class="rows">
+              <div class="lf-proprow"><span class="k">x</span><span class="v">84.0</span></div>
+              <div class="lf-proprow"><span class="k">y</span><span class="v">210.4</span></div>
+            </div>
+          </div>
+          <div class="lf-propgroup"><div class="head">▸ Appearance</div></div>
+          <div class="lf-propgroup"><div class="head">▸ Metadata</div></div>
+          <div class="lf-propgroup"><div class="head">▸ Advanced</div></div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <footer class="lf-status">
+    <span class="seg"><strong>Sunny Day for Max</strong></span>
+    <span class="seg">p 12 / 27</span>
+    <span class="seg">150%</span>
+    <span class="seg">finding 1 / 2</span>
+    <span class="spacer"></span>
+    <span class="seg"><span class="dot"></span> backend</span>
+    <span class="seg"><span class="dot"></span> storage</span>
+    <span class="seg"><span class="dot"></span> static</span>
+    <span class="seg">API v1</span>
+  </footer>
+</div>
+
+<div class="mock-bar">
+  <a class="lf-btn sm" href="index.html">☰ All mockups</a>
+  <button class="lf-btn sm" onclick="lfToggleTheme()">◐ Theme</button>
+</div>
+</body>
+</html>

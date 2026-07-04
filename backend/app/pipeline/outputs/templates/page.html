@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Page {{ page_number }}</title>
+  <link rel="stylesheet" href="{{ common_css_href }}">
+  {% if page_css_href %}<link rel="stylesheet" href="{{ page_css_href }}">{% endif %}
+</head>
+<body>
+  <div id="page-{{ page_id }}" class="lf-page lf-page-{{ page_number }}" data-page="{{ page_number }}" data-width="{{ width }}" data-height="{{ height }}" data-rotation="{{ rotation }}">
+    <div class="lf-layer lf-layer-background">
+      {% if background_src %}<img class="lf-page-background" data-type="background" src="{{ background_src }}" alt="">{% endif %}
+    </div>
+    <div class="lf-layer lf-layer-images">
+      {% for fragment in image_fragments %}{{ fragment | safe }}
+      {% endfor %}
+    </div>
+    <div class="lf-layer lf-layer-shapes">
+      {% for fragment in shape_fragments %}{{ fragment | safe }}
+      {% endfor %}
+    </div>
+    <div class="lf-layer lf-layer-text">
+      {% for fragment in text_fragments %}{{ fragment | safe }}
+      {% endfor %}
+    </div>
+    <div class="lf-layer lf-layer-overlay"></div>
+  </div>
+</body>
+</html>

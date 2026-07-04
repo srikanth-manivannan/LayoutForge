@@ -1,0 +1,356 @@
+/* Workspace shell: NavRail, resizable panel chrome, tab strip, dashboard,
+   and the IDE-style project tree. Panel *content* (Toolbar, ProjectExplorer,
+   PreviewPane, PropertiesPanel, LogPanel) keeps its existing styling from
+   layout.css — this file only covers the new shell/workspace scaffolding. */
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+.lf-shell {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  height: 100vh;
+  background-color: var(--lf-bg-canvas);
+}
+
+.lf-shell-body {
+  display: grid;
+  grid-template-columns: var(--lf-nav-rail-width) 1fr;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.lf-shell-content {
+  overflow: hidden;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* --- Nav rail --- */
+
+.lf-nav-rail {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--lf-bg-surface);
+  border-right: 1px solid var(--lf-border);
+  padding: var(--lf-density-sm) 0;
+  overflow-y: auto;
+}
+
+.lf-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lf-nav-group-context {
+  margin-top: var(--lf-density-md);
+  padding-top: var(--lf-density-md);
+  border-top: 1px solid var(--lf-border);
+}
+
+.lf-nav-section-title {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  color: var(--lf-text-muted);
+  text-align: center;
+  margin-bottom: var(--lf-density-xs);
+  letter-spacing: 0.04em;
+}
+
+.lf-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: var(--lf-density-sm) var(--lf-density-xs);
+  text-decoration: none;
+  color: var(--lf-text-muted);
+  font-size: 0.65rem;
+  border-left: 2px solid transparent;
+}
+
+.lf-nav-item:hover {
+  background-color: var(--lf-bg-sunken);
+  color: var(--lf-text);
+}
+
+.lf-nav-item.active {
+  color: var(--lf-accent);
+  background-color: var(--lf-accent-subtle);
+  border-left-color: var(--lf-accent);
+}
+
+.lf-nav-icon {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* --- Resizable workspace panels --- */
+
+.lf-workspace-vertical,
+.lf-workspace-horizontal {
+  height: 100%;
+}
+
+.lf-workspace-panel {
+  overflow: auto;
+  background-color: var(--lf-bg-surface);
+  height: 100%;
+  min-height: 0;
+}
+
+.lf-workspace-explorer,
+.lf-workspace-properties {
+  overflow-y: auto;
+}
+
+.lf-workspace-center {
+  overflow: hidden;
+  background-color: var(--lf-bg-canvas);
+}
+
+.lf-workspace-bottom-dock {
+  overflow: hidden;
+}
+
+.lf-resize-handle {
+  background-color: var(--lf-border);
+  transition: background-color 0.1s ease;
+}
+
+.lf-resize-handle:hover,
+.lf-resize-handle[data-resize-handle-active] {
+  background-color: var(--lf-accent);
+}
+
+.lf-resize-handle-vertical {
+  width: 4px;
+}
+
+.lf-resize-handle-horizontal {
+  height: 4px;
+}
+
+/* --- Center dock tab strip --- */
+
+.lf-tab-strip {
+  display: flex;
+  gap: 2px;
+  padding: var(--lf-density-xs) var(--lf-density-sm) 0;
+  background-color: var(--lf-bg-surface);
+  border-bottom: 1px solid var(--lf-border);
+}
+
+.lf-tab {
+  border: none;
+  background: none;
+  padding: var(--lf-density-sm) var(--lf-density-md);
+  font-size: 0.8rem;
+  color: var(--lf-text-muted);
+  border-bottom: 2px solid transparent;
+}
+
+.lf-tab:hover {
+  color: var(--lf-text);
+}
+
+.lf-tab.active {
+  color: var(--lf-accent);
+  border-bottom-color: var(--lf-accent);
+  font-weight: 600;
+}
+
+.lf-center-dock-content {
+  min-height: 0;
+  height: 100%;
+}
+
+/* --- Explorer / IDE tree --- */
+
+.lf-explorer-tree {
+  font-size: 0.8rem;
+}
+
+.lf-tree {
+  padding: var(--lf-density-sm);
+}
+
+.lf-tree-section-toggle {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: var(--lf-density-xs) 0;
+  font-weight: 600;
+  color: var(--lf-text);
+}
+
+.lf-tree-caret {
+  display: inline-block;
+  width: 1em;
+  color: var(--lf-text-muted);
+}
+
+.lf-tree-section-body {
+  padding-left: 1.1rem;
+}
+
+.lf-tree-subsection {
+  margin-bottom: var(--lf-density-xs);
+}
+
+.lf-tree-subsection-title {
+  color: var(--lf-text-muted);
+  font-size: 0.75rem;
+}
+
+.lf-tree-leaf {
+  padding: 1px 0;
+  color: var(--lf-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lf-tree-warnings {
+  margin-top: var(--lf-density-sm);
+  padding: var(--lf-density-sm);
+  background-color: color-mix(in srgb, var(--lf-warning) 12%, transparent);
+  border-radius: var(--lf-radius);
+}
+
+/* Token-backed surface for chrome that used to hard-code bg-white/bg-light —
+   themes swap it automatically. */
+.lf-surface {
+  background-color: var(--lf-bg-surface);
+}
+
+/* --- Dashboard project cards --- */
+
+.lf-card-panel {
+  background: var(--lf-bg-surface);
+  border: 1px solid var(--lf-border);
+  border-radius: var(--lf-radius-lg);
+  box-shadow: var(--lf-shadow-panel);
+}
+
+.lf-project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--lf-density-md);
+}
+
+.lf-project-card {
+  background: var(--lf-bg-surface);
+  border: 1px solid var(--lf-border);
+  border-radius: var(--lf-radius-lg);
+  box-shadow: var(--lf-shadow-panel);
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.lf-project-card:hover {
+  border-color: var(--lf-accent);
+}
+
+.lf-project-thumb {
+  height: 120px;
+  background: var(--lf-bg-sunken);
+  border-bottom: 1px solid var(--lf-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.lf-project-thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  /* Thumbnail paper — document content keeps its own colors. */
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.lf-project-thumb-blank {
+  width: 68px;
+  height: 92px;
+  background: var(--lf-bg-surface);
+  border: 1px solid var(--lf-border);
+}
+
+/* --- Dashboard --- */
+
+.lf-dropzone {
+  border: 2px dashed var(--lf-border-strong);
+  border-radius: var(--lf-radius);
+  padding: 2.5rem 1rem;
+  text-align: center;
+  background-color: var(--lf-bg-surface);
+}
+
+.lf-dropzone.dragging {
+  border-color: var(--lf-accent);
+  background-color: var(--lf-accent-subtle);
+}
+
+.lf-recent-projects li {
+  display: flex;
+  align-items: center;
+  padding: var(--lf-density-sm);
+  border-bottom: 1px solid var(--lf-border);
+  cursor: pointer;
+}
+
+.lf-recent-projects li:hover {
+  background-color: var(--lf-bg-sunken);
+}
+
+.lf-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--lf-density-sm);
+}
+
+.lf-stat-card {
+  background-color: var(--lf-bg-surface);
+  border: 1px solid var(--lf-border);
+  border-radius: var(--lf-radius);
+  padding: var(--lf-density-md);
+  box-shadow: var(--lf-shadow-panel);
+}
+
+.lf-stat-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.lf-stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--lf-text-muted);
+}
+
+.lf-job-card {
+  background-color: var(--lf-bg-surface);
+  border: 1px solid var(--lf-border);
+  border-radius: var(--lf-radius);
+  padding: var(--lf-density-md);
+}
+
+.lf-log-snippet {
+  background-color: #12181f;
+  color: #d7dde5;
+  border-radius: var(--lf-radius);
+  padding: var(--lf-density-sm);
+  font-family: "Consolas", "Courier New", monospace;
+  font-size: 0.7rem;
+  max-height: 160px;
+  overflow-y: auto;
+}

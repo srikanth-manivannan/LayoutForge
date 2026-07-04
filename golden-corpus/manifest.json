@@ -1,0 +1,24 @@
+{
+  "corpus_version": 1,
+  "note": "Categories and per-file baselines for the Golden Corpus. Drop PDFs into the category dirs and record their baseline here (from report.json). See README.md.",
+  "categories": {
+    "children-books": { "stresses": "full-bleed art, display type over images, embedded display fonts", "files": {} },
+    "magazines": { "stresses": "image-heavy multi-column, pull quotes, spanning figures", "files": {} },
+    "novels": { "stresses": "dense prose, paragraph rhythm, reflow to <p>", "files": {} },
+    "dictionaries": { "stresses": "dense justified columns, abbreviations, italics, high glyph escalation", "files": {} },
+    "textbooks": { "stresses": "mixed structure, figures, sidebars, tables", "files": {} },
+    "government": { "stresses": "forms, ruled + borderless tables, fixed layout, compliance", "files": {} },
+    "math": { "stresses": "equations, fractions, matrices, operators, Greek", "files": {} },
+    "engineering": { "stresses": "diagrams, tables, units, scientific notation", "files": {} },
+    "multilingual": { "stresses": "mixed scripts, accents, CJK", "files": {} },
+    "rtl": { "stresses": "Arabic/Hebrew, bidi, right-to-left width fitting", "files": {} },
+    "newspapers": { "stresses": "many narrow columns, complex reading order", "files": {} },
+    "comics": { "stresses": "irregular layout, speech bubbles, minimal body text", "files": {} }
+  },
+  "baseline_schema": {
+    "glyph_fraction_max": "upper bound on report.performance-derived glyph fraction",
+    "mean_reconstruction_confidence_min": "lower bound",
+    "max_unexpected_font_fallbacks": 0,
+    "max_total_duration_seconds": "generous ceiling for regression detection"
+  }
+}

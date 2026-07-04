@@ -1,0 +1,9 @@
+# Tasks
+- Setup
+- Upload
+- Extraction
+- HTML
+- CSS
+- Preview
+- Logging
+- Polish
