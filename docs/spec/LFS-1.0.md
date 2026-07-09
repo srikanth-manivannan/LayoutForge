@@ -83,6 +83,15 @@ Rules:
   failure); custom-encoded subsets **MUST** have their cmap reconciled from
   rendered ground truth; required sfnt tables **MUST** be synthesized if the
   subset omits them.
+- **Character fidelity (ADR-010, gate 0):** no character may be lost,
+  silently altered, or painted blank. A served font **MUST NOT** map a
+  non-whitespace character to an empty glyph (such mappings are purged after
+  the sibling-subset merge so browsers fall back visibly). Substitutions
+  (fallback-font rendering) are permitted, counted, and reported
+  (`fidelity` in `report.json`); `chars_lost` **MUST** equal 0 for every
+  conversion. Unicode text **MUST** come from the glyph stream — never
+  reconstructed from measurements (measurements position, never recover,
+  characters).
 
 ## 3. Reconstruction Decision (normative — frozen contract, ADR-002)
 

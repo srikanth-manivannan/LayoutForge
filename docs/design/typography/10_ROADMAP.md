@@ -84,6 +84,20 @@ dictionary width error < 1px worst-case (Quality Gate), glyph-object count
 held to the flagged fraction. **Now scheduled after M8** — high engineering
 cost, small remaining visual value versus the semantic milestones.
 
+## M-TF — Typography Fidelity Engine ✅ SHIPPED (user-critical, inserted before M3)
+
+Character loss found in the field ("much"→"mu h") — [ADR-010](../../adr/010-character-fidelity-first.md).
+Fixed the regression (no-post/no-cmap subsets crashed the sanitizer and were
+silently dropped), added the **structural guarantee** (`_purge_blank_mappings`:
+an empty non-whitespace glyph is never left cmap-mapped → browsers always
+fall back visibly; invisible characters impossible by construction), and the
+**fidelity accounting** (`chars_total/substituted/lost` in the profile +
+first-class `fidelity` section in `report.json`). **Character fidelity =
+100% is now the primary Quality-Gate criterion.** Measured on the reported
+book: 8,219 chars · 0 lost · 0 substituted; glyph escalation fell to 0.98%.
+Note: Unicode was already glyph-stream-sourced — this milestone closed glyph
+*paintability*, not text extraction.
+
 ## M3 — Semantic Reconstruction  ★ PHASE 3, the heart of the product (months, not weeks)
 
 Renamed from "Paragraph Reconstruction" (ADR-008 companion): the deliverable

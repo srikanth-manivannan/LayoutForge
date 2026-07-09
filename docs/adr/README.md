@@ -19,5 +19,6 @@ Format per ADR: **Context → Decision → Consequences → Status.**
 | [007](007-capability-architecture.md) | Capability Architecture | Accepted (direction; staged to M4) |
 | [008](008-semantic-first-ordering.md) | Semantic-First Reconstruction Ordering | Accepted |
 | [009](009-core-v1-platform-freeze.md) | Core v1.0 Platform Freeze | Accepted (LOCKED) |
+| [010](010-character-fidelity-first.md) | Character Fidelity First | Accepted (primary Quality-Gate criterion) |
 
 Design detail for each lives in [../design/typography/](../design/typography/00_OVERVIEW.md).

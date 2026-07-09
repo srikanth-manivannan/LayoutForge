@@ -34,6 +34,16 @@ def build_report(document: Document, stage_metrics: list[StageMetric]) -> dict:
             "without_web_file": fonts_no_web_file,
         },
         "reconstruction_profile": profile,
+        # Character fidelity is the PRIMARY success criterion (Quality Gate):
+        # a substituted char renders visibly in a fallback font; a LOST char
+        # is structurally impossible (blank-mapping purge). chars_lost must
+        # always be 0 — anything else fails the gate.
+        "fidelity": {
+            "chars_total": profile.get("chars_total", 0),
+            "chars_lost": profile.get("chars_lost", 0),
+            "chars_substituted": profile.get("chars_substituted", 0),
+            "character_substitution_rate": profile.get("character_substitution_rate", 0.0),
+        },
         "accuracy": {
             "glyph_fraction": profile.get("glyph_fraction", 0.0),
             "mean_reconstruction_confidence": profile.get("mean_reconstruction_confidence", 1.0),

@@ -7,9 +7,24 @@ per-conversion `report.json` (M1.7) and the regression suite.
 
 ## Targets
 
+**Character fidelity = 100% is the PRIMARY success criterion.** Pixel-perfect
+rendering is valuable, but if a single character disappears ("much" →
+"mu h"), the document is no longer faithfully reconstructed. Text
+preservation is the first gate every conversion must pass. A character may
+be *substituted* (rendered visibly in a fallback font, counted and reported)
+— it may **never** be lost (painted as nothing). Enforced structurally: the
+blank-mapping purge unmaps any empty non-whitespace glyph after the
+sibling-subset merge, so browsers always fall back visibly.
+
 | Metric | Target | Enforced by |
 |---|---|---|
+| **Character fidelity** | **100.0%** (`fidelity.chars_lost == 0`, always) | blank-mapping purge (structural) + `report.json` + corpus tests |
+| **Unicode fidelity** | **100.0%** (DOM text == extracted glyph-stream text) | extraction is glyph-stream-sourced; corpus assertion |
 | Visual fidelity (overlay vs source) | ≥ 99.9% (worst-case word width error < 1px after M2) | benchmark corpus + browser measurement |
+| Font fidelity | ≥ 99.9% (chars painted in their own font; substitution rate reported) | `fidelity.character_substitution_rate` in `report.json` |
+| Reading order | ≥ 99.9% | M3-WP3 + Validation (as it lands) |
+| Table fidelity | ≥ 99% (confidence-gated; never a wrong table) | M3-WP4 + Validation (as it lands) |
+| Math fidelity | ≥ 99% (MathML ladder; never flattened) | M4 + Validation (as it lands) |
 | Unexpected font fallbacks | **0** (embedded font with no served file) | `test_engine_stabilization.test_no_unexpected_font_fallbacks` |
 | Validation regressions | 0 new errors on the corpus | Validation engine (2C) over corpus |
 | Reconstruction profile | populated; `glyph_fraction` within document-class band | `test_benchmark_profile_is_populated_and_sane` |

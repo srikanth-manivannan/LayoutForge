@@ -190,6 +190,19 @@ def _ensure_required_tables(font: TTFont, family: str) -> None:
     the entire page to fallback fonts. OS/2 metrics are taken from the
     existing hhea so all metric pairs agree (the baseline-consistency rule
     from the bare-CFF work)."""
+    # A subset missing BOTH post and cmap has no source for glyph names —
+    # fontTools raises "illegal use of getGlyphOrder()" inside any
+    # FontBuilder setup call. (Regression caught live: the sanitizer
+    # swallowed that error and silently DROPPED the one ComicSans subset
+    # carrying the real c/g/W/quote outlines — invisible characters. The
+    # character-fidelity gate now exists so this class of failure can never
+    # be silent again.) Synthesize a glyph order up front.
+    try:
+        font.getGlyphOrder()
+    except Exception:  # noqa: BLE001 - no post/cmap to derive names from
+        count = font["maxp"].numGlyphs if "maxp" in font else 0
+        font.setGlyphOrder([".notdef"] + [f"glyph{i:05d}" for i in range(1, count)])
+
     builder = FontBuilder(font=font)
     if "name" not in font:
         builder.setupNameTable({"familyName": family, "styleName": "Regular"})
@@ -205,9 +218,11 @@ def _ensure_required_tables(font: TTFont, family: str) -> None:
     if "post" not in font:
         builder.setupPost()
     if "cmap" not in font:
-        # Presence is required for OTS; real entries arrive from the
-        # texttrace reconciliation / sibling-subset merge passes.
-        builder.setupCharacterMap({})
+        # Presence is required for OTS, and fontTools can't build an EMPTY
+        # cmap — seed one harmless mapping; the texttrace reconciliation /
+        # sibling-merge passes fill in the real entries immediately after.
+        order = font.getGlyphOrder()
+        builder.setupCharacterMap({0x20: order[0]})
 
 
 def _sanitize_for_web(ext: str, content: bytes, family: str = "LayoutForge") -> bytes | None:
@@ -271,6 +286,62 @@ def _reconcile_cmap_from_usage(fonts_dir: Path, font: FontResource, usage: dict[
         logger.info("cmap reconciled from texttrace for %s (%s mappings)", font.original_name, len(usage))
     except Exception:  # noqa: BLE001 - reconciliation is best-effort hardening
         logger.warning("cmap reconciliation failed for %s", font.original_name, exc_info=True)
+
+
+# Characters that legitimately map to blank glyphs — purging these would be
+# wrong (the browser must render them as the font's own whitespace).
+_EXPECTED_BLANK_CODEPOINTS = {0x09, 0x0A, 0x0D, 0x20, 0xA0, 0x2007, 0x2009, 0x200A, 0x200B, 0x2060, 0xFEFF}
+
+
+def _purge_blank_mappings(fonts_dir: Path, fonts: list[FontResource]) -> dict[str, int]:
+    """Character Fidelity guarantee: a cmap entry that maps a NON-whitespace
+    character to an EMPTY glyph is never left in a served font.
+
+    An empty-but-mapped glyph is the one failure mode browsers cannot save:
+    per-character font fallback only triggers when the cmap has NO entry —
+    a mapped blank paints as *nothing* (seen live: "much"→"mu h",
+    "couldn't"→" ouldn't"). Runs AFTER the sibling-subset merge (which fills
+    every outline it has a donor for); whatever is still blank has no
+    recoverable outline in any sibling, so the honest behavior is to unmap
+    it — the character then renders visibly in the stack's fallback font
+    and is counted as a SUBSTITUTION in the fidelity report, never lost.
+
+    Returns {font_id: purged_count} for the report."""
+    purged_by_font: dict[str, int] = {}
+    for resource in fonts:
+        if not resource.filename or not resource.filename.endswith(".ttf"):
+            continue  # CFF wrapped fonts are rebuilt from real outlines
+        try:
+            path = fonts_dir / resource.filename
+            tt = TTFont(io.BytesIO(path.read_bytes()))
+            if "glyf" not in tt or "cmap" not in tt:
+                continue
+            glyf = tt["glyf"]
+            cmap_map = dict(tt.getBestCmap() or {})
+            to_purge = [
+                codepoint
+                for codepoint, glyph_name in cmap_map.items()
+                if codepoint not in _EXPECTED_BLANK_CODEPOINTS and _is_empty_glyph(glyf, glyph_name)
+            ]
+            if not to_purge:
+                continue
+            for codepoint in to_purge:
+                del cmap_map[codepoint]
+            builder = FontBuilder(font=tt)
+            builder.setupCharacterMap(cmap_map or {0x20: tt.getGlyphOrder()[0]})
+            buffer = io.BytesIO()
+            tt.save(buffer)
+            path.write_bytes(buffer.getvalue())
+            purged_by_font[resource.id] = len(to_purge)
+            logger.info(
+                "character-fidelity purge: %s unmapped %s blank glyphs (%s) — these chars now render via fallback, never invisibly",
+                resource.original_name,
+                len(to_purge),
+                "".join(chr(c) for c in sorted(to_purge)[:12]),
+            )
+        except Exception:  # noqa: BLE001 - purging is protective hardening; never fail the stage
+            logger.warning("character-fidelity purge failed for %s", resource.original_name, exc_info=True)
+    return purged_by_font
 
 
 def _is_empty_glyph(glyf_table, glyph_name: str) -> bool:
@@ -518,5 +589,9 @@ class ExtractFontsStage(Stage):
             if font and font.filename and font.filename.endswith((".ttf", ".otf")):
                 _reconcile_cmap_from_usage(fonts_dir, font, usage)
         _complete_sibling_subsets(fonts_dir, context.document.fonts)
+        # Character Fidelity guarantee (runs LAST): any mapping the merge
+        # couldn't rescue is unmapped so the browser falls back visibly —
+        # a character can be substituted, never silently lost.
+        context.scratch["fidelity_purged_mappings"] = _purge_blank_mappings(fonts_dir, context.document.fonts)
 
         context.scratch["font_id_by_name"] = font_id_by_name

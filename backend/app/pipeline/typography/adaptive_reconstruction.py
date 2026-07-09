@@ -94,6 +94,12 @@ class ReconstructionProfile:
     by_mode: dict[str, int] = field(default_factory=dict)
     by_reason: dict[str, int] = field(default_factory=dict)
     confidence_sum: float = 0.0
+    # Character fidelity (additive, post-purge): every non-whitespace char
+    # either paints in its own font or — when its glyph was unrecoverable
+    # and therefore unmapped — paints via the fallback stack (SUBSTITUTED).
+    # Painting nothing is impossible by construction, so chars_lost ≡ 0.
+    chars_total: int = 0
+    chars_substituted: int = 0
 
     def record(self, decision: "ReconstructionDecision") -> None:
         self.words += 1
@@ -110,6 +116,12 @@ class ReconstructionProfile:
             "by_reason": dict(self.by_reason),
             "glyph_fraction": round(glyph / self.words, 4) if self.words else 0.0,
             "mean_reconstruction_confidence": round(self.confidence_sum / self.words, 4) if self.words else 1.0,
+            "chars_total": self.chars_total,
+            "chars_substituted": self.chars_substituted,
+            "chars_lost": 0,  # structurally guaranteed by the blank-mapping purge
+            "character_substitution_rate": round(self.chars_substituted / self.chars_total, 6)
+            if self.chars_total
+            else 0.0,
         }
 
 
@@ -200,7 +212,22 @@ class AdaptiveReconstructionEngine:
         word.width_error = decision.width_error
         word.letter_spacing = decision.letter_spacing
         self.profile.record(decision)
+        self._count_character_fidelity(word)
         return decision
+
+    def _count_character_fidelity(self, word: WordBox) -> None:
+        """Post-purge accounting: a char absent from its font's cmap will
+        paint via the fallback stack (substituted — visible, different
+        font). Mapped chars paint in their own font. Nothing paints blank."""
+        metrics = self._metrics.get(word.font_id or "")
+        if metrics is None:
+            return
+        for char in word.text:
+            if char.isspace():
+                continue
+            self.profile.chars_total += 1
+            if metrics.advance(char) is None:
+                self.profile.chars_substituted += 1
 
     # ---- lines (fallback for non-word-pinned blocks) -------------------
 

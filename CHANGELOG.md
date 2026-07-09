@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed/Added — Typography Fidelity Engine: character loss is now structurally impossible (ADR-010)
+
+User-reported invisible characters ("much"→"mu h", "couldn't"→" ouldn't").
+Root cause: a subset missing both `post` and `cmap` crashed
+`_ensure_required_tables` (fontTools "illegal use of getGlyphOrder()"); the
+sanitizer swallowed it and **silently dropped the font**, leaving the
+sibling-subset merge without its outline donor — the surviving subset
+mapped those characters to empty glyphs, which browsers paint as nothing
+(per-char fallback triggers only on MISSING cmap entries, never mapped
+blanks).
+
+- **Regression fix**: synthesize a glyph order and seed a non-empty cmap
+  before FontBuilder repairs; the dropped ComicSans subset now sanitizes.
+- **Structural guarantee** (`_purge_blank_mappings`, runs after
+  reconciliation + sibling merge): any cmap entry still pointing at an
+  empty non-whitespace glyph is unmapped, so the character renders visibly
+  via the fallback stack. An invisible character is impossible by
+  construction. (531 stale blank mappings purged per ComicSans subset.)
+- **Fidelity accounting**: profile counts `chars_total/substituted/lost`;
+  `report.json` gains a first-class `fidelity` section; **Character
+  fidelity = 100% is the new PRIMARY Quality-Gate criterion** (with Unicode
+  100%, font ≥99.9%, reading order ≥99.9%, table ≥99%, math ≥99% KPIs).
+- **Verified on the reported book**: the failing subset restored, both
+  ComicSans files carry real outlines for every affected char (c g W k q
+  j J + curly quotes), zero blank-mapped entries in any served font, and
+  the report reads **8,219 chars · 0 lost · 0 substituted**. Side effect of
+  restoring the subset: glyph escalation fell to 0.98% (mean confidence
+  0.9986). 98 backend tests (3 new: sanitizer regression, purge behavior,
+  substitution accounting). ADR-010; LFS §2 fidelity clause; roadmap M-TF
+  entry (inserted before M3 per review).
+
 ### Added — Typography Reconstruction Engine v2 (architecture) + Milestone 1 (word positioning)
 
 Commissioned architecture for reconstructing document *typography* (not
