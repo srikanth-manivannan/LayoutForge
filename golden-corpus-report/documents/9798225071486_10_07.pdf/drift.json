@@ -1,0 +1,518 @@
+{
+  "overall": {
+    "count": 1039,
+    "mean": 0.461,
+    "median": 0.163,
+    "p95": 0.743,
+    "max": 128.056
+  },
+  "by_page": {
+    "1": {
+      "count": 11,
+      "mean": 9.665,
+      "median": 0.336,
+      "p95": 102.375,
+      "max": 102.375
+    },
+    "4": {
+      "count": 183,
+      "mean": 0.142,
+      "median": 0.001,
+      "p95": 1.632,
+      "max": 2.892
+    },
+    "5": {
+      "count": 9,
+      "mean": 14.651,
+      "median": 0.541,
+      "p95": 128.056,
+      "max": 128.056
+    },
+    "6": {
+      "count": 17,
+      "mean": 0.274,
+      "median": 0.256,
+      "p95": 1.14,
+      "max": 1.14
+    },
+    "7": {
+      "count": 43,
+      "mean": 0.273,
+      "median": 0.313,
+      "p95": 0.682,
+      "max": 0.752
+    },
+    "8": {
+      "count": 38,
+      "mean": 0.239,
+      "median": 0.272,
+      "p95": 0.701,
+      "max": 0.77
+    },
+    "9": {
+      "count": 19,
+      "mean": 0.263,
+      "median": 0.202,
+      "p95": 0.666,
+      "max": 0.666
+    },
+    "10": {
+      "count": 37,
+      "mean": 0.323,
+      "median": 0.31,
+      "p95": 0.77,
+      "max": 1.14
+    },
+    "11": {
+      "count": 21,
+      "mean": 0.249,
+      "median": 0.163,
+      "p95": 0.596,
+      "max": 1.14
+    },
+    "12": {
+      "count": 36,
+      "mean": 0.223,
+      "median": 0.246,
+      "p95": 0.54,
+      "max": 0.673
+    },
+    "13": {
+      "count": 17,
+      "mean": 0.268,
+      "median": 0.187,
+      "p95": 1.14,
+      "max": 1.14
+    },
+    "14": {
+      "count": 16,
+      "mean": 0.372,
+      "median": 0.357,
+      "p95": 1.14,
+      "max": 1.14
+    },
+    "15": {
+      "count": 38,
+      "mean": 0.281,
+      "median": 0.225,
+      "p95": 1.14,
+      "max": 1.14
+    },
+    "16": {
+      "count": 21,
+      "mean": 0.348,
+      "median": 0.31,
+      "p95": 0.752,
+      "max": 1.14
+    },
+    "17": {
+      "count": 37,
+      "mean": 0.29,
+      "median": 0.277,
+      "p95": 0.616,
+      "max": 1.14
+    },
+    "18": {
+      "count": 21,
+      "mean": 0.199,
+      "median": 0.163,
+      "p95": 0.482,
+      "max": 0.713
+    },
+    "19": {
+      "count": 20,
+      "mean": 0.189,
+      "median": 0.175,
+      "p95": 0.646,
+      "max": 0.646
+    },
+    "20": {
+      "count": 39,
+      "mean": 0.261,
+      "median": 0.163,
+      "p95": 0.882,
+      "max": 1.14
+    },
+    "21": {
+      "count": 37,
+      "mean": 0.271,
+      "median": 0.279,
+      "p95": 0.67,
+      "max": 0.899
+    },
+    "22": {
+      "count": 17,
+      "mean": 0.298,
+      "median": 0.31,
+      "p95": 0.596,
+      "max": 0.596
+    },
+    "24": {
+      "count": 23,
+      "mean": 0.383,
+      "median": 0.394,
+      "p95": 0.752,
+      "max": 1.14
+    },
+    "25": {
+      "count": 18,
+      "mean": 0.286,
+      "median": 0.243,
+      "p95": 1.14,
+      "max": 1.14
+    },
+    "26": {
+      "count": 39,
+      "mean": 0.248,
+      "median": 0.163,
+      "p95": 0.752,
+      "max": 1.14
+    },
+    "27": {
+      "count": 36,
+      "mean": 0.256,
+      "median": 0.163,
+      "p95": 0.73,
+      "max": 1.14
+    },
+    "28": {
+      "count": 21,
+      "mean": 0.219,
+      "median": 0.219,
+      "p95": 0.666,
+      "max": 0.701
+    },
+    "29": {
+      "count": 20,
+      "mean": 0.319,
+      "median": 0.358,
+      "p95": 0.713,
+      "max": 0.713
+    },
+    "30": {
+      "count": 20,
+      "mean": 0.203,
+      "median": 0.0,
+      "p95": 0.666,
+      "max": 0.666
+    },
+    "31": {
+      "count": 43,
+      "mean": 0.295,
+      "median": 0.274,
+      "p95": 0.743,
+      "max": 1.14
+    },
+    "32": {
+      "count": 22,
+      "mean": 0.394,
+      "median": 0.359,
+      "p95": 0.64,
+      "max": 1.14
+    },
+    "33": {
+      "count": 20,
+      "mean": 0.28,
+      "median": 0.284,
+      "p95": 1.14,
+      "max": 1.14
+    },
+    "34": {
+      "count": 18,
+      "mean": 0.356,
+      "median": 0.322,
+      "p95": 1.14,
+      "max": 1.14
+    },
+    "37": {
+      "count": 6,
+      "mean": 0.302,
+      "median": 0.306,
+      "p95": 0.669,
+      "max": 0.669
+    },
+    "40": {
+      "count": 76,
+      "mean": 0.048,
+      "median": 0.0,
+      "p95": 0.338,
+      "max": 1.77
+    }
+  },
+  "by_font": {
+    "Avenir-Medium": {
+      "count": 10,
+      "mean": 0.0,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+    },
+    "ChauncyDecaf-Medium": {
+      "count": 45,
+      "mean": 0.039,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 1.77
+    },
+    "ChauncyDecaf-Regular": {
+      "count": 1,
+      "mean": 0.0,
+      "median": 0.0,
+      "p95": 0.0,
+      "max": 0.0
+    },
+    "ChauncyPro-Bold": {
+      "count": 8,
+      "mean": 0.635,
+      "median": 0.744,
+      "p95": 1.271,
+      "max": 1.271
+    },
+    "ChauncyPro-Italic": {
+      "count": 3,
+      "mean": 0.055,
+      "median": 0.0,
+      "p95": 0.165,
+      "max": 0.165
+    },
+    "ChauncyPro-Regular": {
+      "count": 765,
+      "mean": 0.279,
+      "median": 0.282,
+      "p95": 0.701,
+      "max": 1.14
+    },
+    "KGDancingontheRooftop": {
+      "count": 22,
+      "mean": 10.559,
+      "median": 0.012,
+      "p95": 102.375,
+      "max": 128.056
+    },
+    "Palatino-Italic": {
+      "count": 3,
+      "mean": 0.003,
+      "median": 0.002,
+      "p95": 0.005,
+      "max": 0.005
+    },
+    "Palatino-Roman": {
+      "count": 181,
+      "mean": 0.144,
+      "median": 0.001,
+      "p95": 1.632,
+      "max": 2.892
+    },
+    "Palatino-Roman-SC700": {
+      "count": 1,
+      "mean": 0.003,
+      "median": 0.003,
+      "p95": 0.003,
+      "max": 0.003
+    }
+  },
+  "by_reason": {
+    "tracking": {
+      "count": 359,
+      "mean": 0.063,
+      "median": 0.0,
+      "p95": 0.224,
+      "max": 0.25,
+      "contribution_pct": 4.8
+    },
+    "width_error": {
+      "count": 428,
+      "mean": 1.018,
+      "median": 0.395,
+      "p95": 1.14,
+      "max": 128.056,
+      "contribution_pct": 91.0
+    },
+    "none": {
+      "count": 237,
+      "mean": 0.009,
+      "median": 0.001,
+      "p95": 0.076,
+      "max": 0.178,
+      "contribution_pct": 0.4
+    },
+    "kerning": {
+      "count": 9,
+      "mean": 1.069,
+      "median": 1.632,
+      "p95": 1.633,
+      "max": 1.633,
+      "contribution_pct": 2.0
+    },
+    "ligature": {
+      "count": 6,
+      "mean": 1.457,
+      "median": 1.355,
+      "p95": 2.892,
+      "max": 2.892,
+      "contribution_pct": 1.8
+    }
+  },
+  "worst_words": [
+    {
+      "page": 5,
+      "text": "Tot\u200atheToad",
+      "font": "KGDancingontheRooftop",
+      "reason": "width_error",
+      "mode": "glyph",
+      "drift_px": 128.056
+    },
+    {
+      "page": 1,
+      "text": "Tot\u200atheToad",
+      "font": "KGDancingontheRooftop",
+      "reason": "width_error",
+      "mode": "glyph",
+      "drift_px": 102.375
+    },
+    {
+      "page": 4,
+      "text": "fiction.",
+      "font": "Palatino-Roman",
+      "reason": "ligature",
+      "mode": "glyph",
+      "drift_px": 2.892
+    },
+    {
+      "page": 4,
+      "text": "artificial",
+      "font": "Palatino-Roman",
+      "reason": "ligature",
+      "mode": "glyph",
+      "drift_px": 2.586
+    },
+    {
+      "page": 4,
+      "text": "fictitiously,",
+      "font": "Palatino-Roman",
+      "reason": "ligature",
+      "mode": "glyph",
+      "drift_px": 2.298
+    },
+    {
+      "page": 4,
+      "text": "for",
+      "font": "Palatino-Roman",
+      "reason": "width_error",
+      "mode": "glyph",
+      "drift_px": 1.884
+    },
+    {
+      "page": 40,
+      "text": "Tot",
+      "font": "ChauncyDecaf-Medium",
+      "reason": "width_error",
+      "mode": "glyph",
+      "drift_px": 1.77
+    },
+    {
+      "page": 4,
+      "text": "of",
+      "font": "Palatino-Roman",
+      "reason": "kerning",
+      "mode": "glyph",
+      "drift_px": 1.633
+    },
+    {
+      "page": 4,
+      "text": "of",
+      "font": "Palatino-Roman",
+      "reason": "kerning",
+      "mode": "glyph",
+      "drift_px": 1.633
+    },
+    {
+      "page": 4,
+      "text": "of",
+      "font": "Palatino-Roman",
+      "reason": "kerning",
+      "mode": "glyph",
+      "drift_px": 1.632
+    },
+    {
+      "page": 4,
+      "text": "of",
+      "font": "Palatino-Roman",
+      "reason": "kerning",
+      "mode": "glyph",
+      "drift_px": 1.632
+    },
+    {
+      "page": 4,
+      "text": "form",
+      "font": "Palatino-Roman",
+      "reason": "width_error",
+      "mode": "glyph",
+      "drift_px": 1.632
+    },
+    {
+      "page": 4,
+      "text": "of",
+      "font": "Palatino-Roman",
+      "reason": "kerning",
+      "mode": "glyph",
+      "drift_px": 1.632
+    },
+    {
+      "page": 5,
+      "text": "Makes",
+      "font": "ChauncyPro-Bold",
+      "reason": "width_error",
+      "mode": "glyph",
+      "drift_px": 1.271
+    },
+    {
+      "page": 1,
+      "text": "Makes",
+      "font": "ChauncyPro-Bold",
+      "reason": "width_error",
+      "mode": "glyph",
+      "drift_px": 1.245
+    },
+    {
+      "page": 6,
+      "text": "Tot",
+      "font": "ChauncyPro-Regular",
+      "reason": "width_error",
+      "mode": "glyph",
+      "drift_px": 1.14
+    },
+    {
+      "page": 10,
+      "text": "Tot",
+      "font": "ChauncyPro-Regular",
+      "reason": "width_error",
+      "mode": "glyph",
+      "drift_px": 1.14
+    },
+    {
+      "page": 11,
+      "text": "Tot",
+      "font": "ChauncyPro-Regular",
+      "reason": "width_error",
+      "mode": "glyph",
+      "drift_px": 1.14
+    },
+    {
+      "page": 13,
+      "text": "Tot",
+      "font": "ChauncyPro-Regular",
+      "reason": "width_error",
+      "mode": "glyph",
+      "drift_px": 1.14
+    },
+    {
+      "page": 14,
+      "text": "Tot",
+      "font": "ChauncyPro-Regular",
+      "reason": "width_error",
+      "mode": "glyph",
+      "drift_px": 1.14
+    }
+  ]
+}

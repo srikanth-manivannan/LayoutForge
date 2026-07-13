@@ -12,9 +12,13 @@ from app.pipeline.stages.extract_images import ExtractImagesStage
 from app.pipeline.stages.extract_text import ExtractTextStage
 from app.pipeline.stages.generate_css import GenerateCssStage
 from app.pipeline.stages.generate_html import GenerateHtmlStage
+from app.pipeline.stages.generate_semantic_html import GenerateSemanticHtmlStage
 from app.pipeline.stages.metadata import MetadataStage
 from app.pipeline.stages.normalize_idm import NormalizeIdmStage
 from app.pipeline.stages.persist_assets import PersistAssetsStage
+from app.pipeline.stages.quality_accounting import QualityAccountingStage
+from app.pipeline.stages.reconstruct_tree import ReconstructTreeStage
+from app.pipeline.stages.validate_idm import ValidateRichIdmStage
 from app.pipeline.stages.render_backgrounds import RenderBackgroundsStage
 from app.pipeline.stages.validate import ValidateStage
 from app.repositories.interfaces import IAssetRepository, IJobRepository, IPageRepository, IProjectRepository
@@ -56,9 +60,23 @@ class ConversionService:
             ExtractImagesStage(self._storage),
             ExtractTextStage(),
             NormalizeIdmStage(self._storage),
+            ReconstructTreeStage(),
+            # Advisory unless semantic rendering is on: surfaces model defects
+            # without blocking the legacy default output (Phase 2.5).
+            ValidateRichIdmStage(strict=self._settings.use_rich_tree),
+            QualityAccountingStage(),  # measured quality (Phase 2.7)
             PersistAssetsStage(self._assets, self._pages, self._storage),
+            # RIL: GenerateCss builds+validates the Render Trees (scratch,
+            # derived — discarded after output) and emits the Style Registry;
+            # GenerateHtml compiles the same trees. CSS first so the HTML
+            # validator finds every linked stylesheet on disk.
             GenerateCssStage(self._pages, self._storage),
             GenerateHtmlStage(self._pages, self._storage),
+            GenerateSemanticHtmlStage(
+                self._storage,
+                enabled=self._settings.use_rich_tree,
+                emit_debug_attributes=self._settings.emit_debug_attributes,
+            ),
         ]
 
     def run_pipeline(self, job_id: str) -> None:

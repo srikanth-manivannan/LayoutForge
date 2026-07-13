@@ -37,6 +37,7 @@ __all__ = [
     "ReconstructionProfile",
     "classify_reason",
     "WORD_TOLERANCE_PX",
+    "word_tolerance_px",
 ]
 
 
@@ -55,13 +56,42 @@ class ReconstructionDecision:
     tolerance: float  # px, the WORD/GLYPH threshold in force
     letter_spacing: float = 0.0  # interim per-char correction (GLYPH only)
 
-# A word whose rendered natural width is within this many px of its true PDF
-# box needs no correction — browser layout at the pinned x is already
-# accurate (WORD). A larger error means uniform letter-spacing can't
-# reproduce the word's internal advances; it escalates to GLYPH.
+# A word whose rendered natural width is within tolerance of its true PDF box
+# needs no correction — browser layout at the pinned x is already accurate
+# (WORD). A larger error means uniform letter-spacing can't reproduce the
+# word's internal advances; it escalates to GLYPH.
+#
+# Issue 002A (Rendering Accuracy v1) found the tolerance must scale with the
+# word — but NOT primarily by glyph count. Measured on a real document
+# (docs/ROAD_TO_PHASE4.md): the residual between `word.width` (PyMuPDF's ink
+# BOUNDING BOX) and `natural_text_width` (our pen-ADVANCE sum) is a nearly
+# CONSTANT ~2px regardless of word length (median 1.9–2.5px from 1 to 9
+# glyphs) — the signature of a measurement-DEFINITION gap (a word's ink
+# extent includes its last glyph's right-side overhang beyond its own
+# advance, roughly constant per font/size), not accumulated per-glyph noise.
+# A small residual per-glyph term remains for genuinely longer words.
+# WORD_TOLERANCE_PX is kept as the absolute floor (never tighter than the
+# original M1.5 threshold); _BBOX_ADVANCE_GAP_PX and _PER_GLYPH_ALLOWANCE_PX
+# are calibrated from that measurement.
 WORD_TOLERANCE_PX = 0.3
+_BBOX_ADVANCE_GAP_PX = 2.0
+_PER_GLYPH_ALLOWANCE_PX = 0.08
 _MAX_SPACING_FRACTION_OF_SIZE = 0.25
 _MIN_MEANINGFUL_SPACING = 0.01  # px
+
+# Typography Measurement Engine v2 (M-R2): when a word's ACTUAL advance
+# extent was measured from the PDF's resolved glyph origins, the comparison
+# is advance-to-advance (no bbox definitional gap), so the tolerance is the
+# real target: a per-glyph RMS residual below this means uniform
+# letter-spacing reproduces the word's internal geometry exactly.
+ADVANCE_RESIDUAL_TOLERANCE_PX = 0.25
+
+
+def word_tolerance_px(glyph_count: int) -> float:
+    """The escalation tolerance for a word with `glyph_count` non-space
+    glyphs: the measured bbox-vs-advance definitional gap, plus a small
+    per-glyph allowance for longer words, floored at WORD_TOLERANCE_PX."""
+    return round(max(WORD_TOLERANCE_PX, _BBOX_ADVANCE_GAP_PX + _PER_GLYPH_ALLOWANCE_PX * glyph_count), 3)
 
 # Sequences that form ligatures in most text fonts — a strong signal that a
 # word's width difference is ligature substitution rather than plain kerning.
@@ -135,9 +165,20 @@ class AdaptiveReconstructionEngine:
 
     # ---- words (word-pinned lines, M1.5/M1.6/M1.7) ---------------------
 
-    def decide_word(self, word: WordBox) -> ReconstructionDecision:
-        """Pure decision for one word — the frozen contract (M1.7). No
-        mutation; consumers (M2, validation, analytics) read this."""
+    def decide_word(self, word: WordBox, char_spacing: float = 0.0, measurement=None) -> ReconstructionDecision:
+        """Pure decision for one word — the frozen contract (M1.7), extended
+        (Issue 002B) to CONSUME known genuine character spacing (`char_spacing`,
+        px/glyph — measured by `typography/character_spacing.py` from actual
+        PDF glyph advances) as a known input, never re-derived here. No
+        mutation; consumers (M2, validation, analytics) read this.
+
+        M-R2 (Typography Measurement Engine v2): when `measurement` (a
+        `character_spacing.WordMeasurement`) is present, the decision is made
+        advance-to-advance against the word's MEASURED pen extent, per-word
+        tracking, and uniformity residual — the bbox path below is only the
+        fallback for unmeasured words (rotated/RTL/unmatched lines)."""
+        if measurement is not None and word.text:
+            return self._decide_measured(word, measurement)
         metrics = self._metrics.get(word.font_id or "")
         if metrics is None or not word.text:
             return ReconstructionDecision(
@@ -162,50 +203,102 @@ class AdaptiveReconstructionEngine:
                 tolerance=WORD_TOLERANCE_PX,
             )
 
-        error = word.width - natural
-        if abs(error) <= WORD_TOLERANCE_PX:
-            # WORD level — browser layout is already accurate.
+        glyph_count = len(word.text)
+        tolerance = word_tolerance_px(glyph_count)
+        # Real document typography (measured, not estimated) is expected
+        # width, not a correction — fold it in before comparing.
+        expected = natural + char_spacing * glyph_count
+        error = word.width - expected
+        tracked = abs(char_spacing) >= _MIN_MEANINGFUL_SPACING
+
+        if abs(error) <= tolerance:
+            # WORD level — browser layout (plus any known real tracking,
+            # applied as ordinary CSS letter-spacing) is already accurate.
             return ReconstructionDecision(
                 mode=ReconstructionMode.WORD.value,
-                reason=ReconstructionReason.NONE.value,
+                reason=ReconstructionReason.TRACKING.value if tracked else ReconstructionReason.NONE.value,
                 reconstruction_confidence=round(max(0.0, 1.0 - abs(error) / max(word.width, 1.0)), 4),
-                expected_width=round(natural, 3),
+                expected_width=round(expected, 3),
                 actual_width=word.width,
                 width_error=round(error, 3),
-                tolerance=WORD_TOLERANCE_PX,
+                tolerance=tolerance,
+                letter_spacing=round(char_spacing, 3) if tracked else 0.0,
             )
 
-        # Escalate to GLYPH; attribute the reason.
+        # Escalate to GLYPH; attribute the reason to what's left UNEXPLAINED
+        # after known tracking is already accounted for.
         reason = classify_reason(word.text, error)
-        spacing = error / len(word.text)
-        if abs(spacing) > _MAX_SPACING_FRACTION_OF_SIZE * max(word.font_size, 1.0):
-            # Implausible correction — trust the pinned position, don't distort.
+        residual_spacing = error / glyph_count
+        if abs(residual_spacing) > _MAX_SPACING_FRACTION_OF_SIZE * max(word.font_size, 1.0):
+            # Implausible correction — trust the pinned position, don't distort
+            # beyond the real tracking we already know about.
             return ReconstructionDecision(
                 mode=ReconstructionMode.GLYPH.value,
-                reason=reason,
+                reason=ReconstructionReason.TRACKING.value if tracked else reason,
                 reconstruction_confidence=0.4,
-                expected_width=round(natural, 3),
+                expected_width=round(expected, 3),
                 actual_width=word.width,
                 width_error=round(error, 3),
-                tolerance=WORD_TOLERANCE_PX,
+                tolerance=tolerance,
+                letter_spacing=round(char_spacing, 3) if tracked else 0.0,
             )
-        # Interim: letter-spacing makes WIDTH exact; glyph POSITIONS remain
-        # approximate (uniform vs real kerning), so confidence is capped.
+        # Interim: letter-spacing (known tracking + residual fit) makes WIDTH
+        # exact; glyph POSITIONS remain approximate, so confidence is capped.
         return ReconstructionDecision(
             mode=ReconstructionMode.GLYPH.value,
-            reason=reason,
-            reconstruction_confidence=round(max(0.4, 0.9 - abs(spacing) / max(word.font_size, 1.0)), 4),
-            expected_width=round(natural, 3),
+            reason=ReconstructionReason.TRACKING.value if tracked else reason,
+            reconstruction_confidence=round(max(0.4, 0.9 - abs(residual_spacing) / max(word.font_size, 1.0)), 4),
+            expected_width=round(expected, 3),
             actual_width=word.width,
             width_error=round(error, 3),
-            tolerance=WORD_TOLERANCE_PX,
-            letter_spacing=round(spacing, 3),
+            tolerance=tolerance,
+            letter_spacing=round(char_spacing + residual_spacing, 3),
         )
 
-    def reconstruct_word(self, word: WordBox) -> ReconstructionDecision:
+    def _decide_measured(self, word: WordBox, measurement) -> ReconstructionDecision:
+        """Advance-based decision (M-R2). The word's internal geometry is a
+        MEASURED per-glyph offset series: `tracking` (median offset, real
+        typography → CSS letter-spacing) plus `residual` (RMS about it).
+        A small residual means uniform letter-spacing reproduces the word
+        EXACTLY — it stays WORD regardless of how large the tracking is."""
+        glyph_count = max(1, len(word.text))
+        tracking = measurement.tracking_px
+        residual = measurement.residual_px
+        tracked = abs(tracking) >= _MIN_MEANINGFUL_SPACING
+        # expected = what the browser will render with letter-spacing applied.
+        natural = measurement.advance_px - tracking * glyph_count  # implied nominal sum
+        expected = natural + tracking * glyph_count
+        confidence = round(max(0.4, 1.0 - residual / max(word.font_size, 1.0)), 4)
+
+        if residual <= ADVANCE_RESIDUAL_TOLERANCE_PX:
+            return ReconstructionDecision(
+                mode=ReconstructionMode.WORD.value,
+                reason=ReconstructionReason.TRACKING.value if tracked else ReconstructionReason.NONE.value,
+                reconstruction_confidence=confidence,
+                expected_width=round(expected, 3),
+                actual_width=round(measurement.advance_px, 3),
+                width_error=round(residual, 3),  # post-fit: what remains unexplained
+                tolerance=ADVANCE_RESIDUAL_TOLERANCE_PX,
+                letter_spacing=round(tracking, 3) if tracked else 0.0,
+            )
+        # Genuinely non-uniform internal geometry (kerning / TJ adjustments):
+        # per-glyph placement territory. Letter-spacing still carries the
+        # uniform (real) part; the residual is attributed, not hidden.
+        return ReconstructionDecision(
+            mode=ReconstructionMode.GLYPH.value,
+            reason=classify_reason(word.text, -residual if tracking < 0 else residual),
+            reconstruction_confidence=confidence,
+            expected_width=round(expected, 3),
+            actual_width=round(measurement.advance_px, 3),
+            width_error=round(residual, 3),
+            tolerance=ADVANCE_RESIDUAL_TOLERANCE_PX,
+            letter_spacing=round(tracking, 3) if tracked else 0.0,
+        )
+
+    def reconstruct_word(self, word: WordBox, char_spacing: float = 0.0, measurement=None) -> ReconstructionDecision:
         """Decide and APPLY the decision to the word, recording it in the
         profile. Returns the decision so callers can also consume it."""
-        decision = self.decide_word(word)
+        decision = self.decide_word(word, char_spacing=char_spacing, measurement=measurement)
         word.mode = decision.mode
         word.reason = decision.reason
         word.reconstruction_confidence = decision.reconstruction_confidence

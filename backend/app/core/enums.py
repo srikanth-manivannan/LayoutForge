@@ -30,9 +30,13 @@ class PipelineStage(str, Enum):
     EXTRACT_IMAGES = "extract_images"
     EXTRACT_TEXT = "extract_text"
     NORMALIZE_IDM = "normalize_idm"
+    RECONSTRUCT_TREE = "reconstruct_tree"
+    VALIDATE_IDM = "validate_idm"
+    QUALITY_ACCOUNTING = "quality_accounting"
     PERSIST_ASSETS = "persist_assets"
     GENERATE_CSS = "generate_css"
     GENERATE_HTML = "generate_html"
+    GENERATE_SEMANTIC_HTML = "generate_semantic_html"
     GENERATE_MANIFEST = "generate_manifest"
     FINISH = "finish"
 
@@ -79,6 +83,12 @@ class ReconstructionReason(str, Enum):
     - VERTICAL:    vertical writing mode (CJK).
     - ROTATION:    rotated run.
     - FONT_SUBSET: glyphs missing from the embedded subset (low coverage).
+    - TRACKING:    genuine PDF character spacing (Tc), measured from actual
+                    glyph advances (Rendering Accuracy v1, Issue 002B) — real
+                    document typography, applied as letter-spacing, not a
+                    width-fitting hack. May appear at WORD level (spacing
+                    fully accounts for the residual) or GLYPH level (spacing
+                    plus a further per-glyph correction).
     - UNKNOWN:     escalated/uncertain but unattributed (unmeasurable font).
     """
 
@@ -91,4 +101,5 @@ class ReconstructionReason(str, Enum):
     VERTICAL = "vertical"
     ROTATION = "rotation"
     FONT_SUBSET = "font_subset"
+    TRACKING = "tracking"
     UNKNOWN = "unknown"

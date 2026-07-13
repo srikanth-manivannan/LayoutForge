@@ -28,12 +28,13 @@ def test_word_within_tolerance_stays_word_no_correction() -> None:
 
 
 def test_word_beyond_tolerance_escalates_to_glyph() -> None:
-    # box 8.0 → 2.0px error > 0.3px → GLYPH, interim letter-spacing applied
-    word = make_word("AB", width=8.0)
+    # box 6.0 → -4.0px error, beyond the calibrated tolerance (Issue 002A:
+    # ~2px bbox-vs-advance floor + small per-glyph term) → GLYPH.
+    word = make_word("AB", width=6.0)
     apply_adaptive_precision(word, {"f1": make_metrics()})
     assert word.mode == "glyph"
-    assert word.letter_spacing == -1.0  # -2.0 / 2 chars
-    assert word.width_error == -2.0
+    assert word.letter_spacing == -2.0  # -4.0 / 2 chars
+    assert word.width_error == -4.0
 
 
 def test_implausible_correction_flags_glyph_without_distorting() -> None:

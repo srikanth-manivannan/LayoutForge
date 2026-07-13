@@ -86,7 +86,10 @@ def test_run_pipeline_extracts_text_images_and_fonts_end_to_end(db_session, tmp_
 
     assets = asset_repo.list_by_project(project.id)
     image_assets = [a for a in assets if a.type.value == "image"]
-    assert len(image_assets) == 3  # 2 backgrounds + 1 deduplicated embedded image
+    # Backgrounds are text-redacted (2026-07-13) — the fixture's two pages
+    # differ only by heading text, so with text stripped the backgrounds are
+    # pixel-identical and correctly dedup to 1, plus 1 deduplicated image.
+    assert len(image_assets) == 2
 
     db_pages = {p.page_number: p for p in page_repo.list_by_project(project.id)}
     assert db_pages[1].css_path == "resources/css/page_0001.css"

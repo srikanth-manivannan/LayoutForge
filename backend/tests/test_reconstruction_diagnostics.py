@@ -60,7 +60,9 @@ def test_decide_word_returns_frozen_contract_without_mutating() -> None:
     assert decision.expected_width == 13.0
     assert decision.actual_width == 9.0
     assert decision.width_error == -4.0
-    assert decision.tolerance == 0.3
+    # Issue 002A: tolerance is calibrated from the measured bbox-vs-advance
+    # gap (~2px) + a small per-glyph term, not a flat 0.3px constant.
+    assert decision.tolerance == 2.16
     import dataclasses
 
     assert dataclasses.is_dataclass(decision)

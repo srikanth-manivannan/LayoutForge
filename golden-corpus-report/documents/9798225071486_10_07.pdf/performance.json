@@ -1,0 +1,19 @@
+{
+  "stage_seconds": {
+    "validate": 0.0407,
+    "metadata": 0.06,
+    "render_background": 14.8711,
+    "extract_fonts": 25.0917,
+    "extract_images": 60.0348,
+    "extract_text": 1.2256,
+    "normalize_idm": 0.925,
+    "reconstruct_tree": 0.1375,
+    "validate_idm": 0.0107,
+    "quality_accounting": 0.0108,
+    "persist_assets": 0.7477,
+    "generate_css": 0.1587,
+    "generate_html": 0.4703,
+    "generate_semantic_html": 0.0608
+  },
+  "total_seconds": 103.8454
+}

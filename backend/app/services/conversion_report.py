@@ -34,6 +34,9 @@ def build_report(document: Document, stage_metrics: list[StageMetric]) -> dict:
             "without_web_file": fonts_no_web_file,
         },
         "reconstruction_profile": profile,
+        # Measured quality (Phase 2.7): per-stage conservation ledger +
+        # release scorecard — the objective, comparable definition of "done".
+        "quality": document.quality or {},
         # Character fidelity is the PRIMARY success criterion (Quality Gate):
         # a substituted char renders visibly in a fallback font; a LOST char
         # is structurally impossible (blank-mapping purge). chars_lost must

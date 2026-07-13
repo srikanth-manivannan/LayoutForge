@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 
 from app.pipeline.elements.bbox import BoundingBox
 from app.pipeline.elements.image import ImageElement
+from app.pipeline.elements.region import Region
 from app.pipeline.elements.shape import ShapeElement
 from app.pipeline.elements.textbox import TextBlock
 
@@ -23,6 +24,11 @@ class Page:
     images: list[ImageElement] = field(default_factory=list)
     shapes: list[ShapeElement] = field(default_factory=list)
     fonts_used: list[str] = field(default_factory=list)
+    # Rich IDM (ADR-011). The typographic tree built by Typography/Semantic
+    # reconstruction, held in parallel with `text_blocks` during the phased
+    # migration. Empty until a reconstruction stage populates it; the
+    # renderer prefers it when present and falls back to `text_blocks`.
+    regions: list[Region] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
@@ -37,6 +43,7 @@ class Page:
             "images": [i.to_dict() for i in self.images],
             "shapes": [s.to_dict() for s in self.shapes],
             "fonts_used": list(self.fonts_used),
+            "regions": [r.to_dict() for r in self.regions],
         }
 
     @classmethod
@@ -53,4 +60,5 @@ class Page:
             images=[ImageElement.from_dict(i) for i in data.get("images", [])],
             shapes=[ShapeElement.from_dict(s) for s in data.get("shapes", [])],
             fonts_used=list(data.get("fonts_used", [])),
+            regions=[Region.from_dict(r) for r in data.get("regions", [])],
         )

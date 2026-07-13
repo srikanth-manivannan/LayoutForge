@@ -1,0 +1,50 @@
+{
+  "count": 3,
+  "issues": [
+    {
+      "id": "scorecard:glyph_escalation_rate-7ae13a19",
+      "category": "Rendering",
+      "code": "scorecard:glyph_escalation_rate",
+      "stage": "font_metrics",
+      "severity": "P2",
+      "release_blocking": false,
+      "page": null,
+      "message": "glyph_escalation_rate 0.4264 misses target 0.1",
+      "status": "Open",
+      "detected_by": "RVF",
+      "regression_test": null,
+      "fixed_in": null,
+      "verified_by": null
+    },
+    {
+      "id": "scorecard:mean_reconstruction_confidence-19dd4dd9",
+      "category": "Rendering",
+      "code": "scorecard:mean_reconstruction_confidence",
+      "stage": "font_metrics",
+      "severity": "P2",
+      "release_blocking": false,
+      "page": null,
+      "message": "mean_reconstruction_confidence 0.984 misses target 0.99",
+      "status": "Open",
+      "detected_by": "RVF",
+      "regression_test": null,
+      "fixed_in": null,
+      "verified_by": null
+    },
+    {
+      "id": "scorecard:mean_width_error_px-106f3f34",
+      "category": "Rendering",
+      "code": "scorecard:mean_width_error_px",
+      "stage": "font_metrics",
+      "severity": "P2",
+      "release_blocking": false,
+      "page": null,
+      "message": "mean_width_error_px 0.461 misses target 0.25",
+      "status": "Open",
+      "detected_by": "RVF",
+      "regression_test": null,
+      "fixed_in": null,
+      "verified_by": null
+    }
+  ]
+}

@@ -67,19 +67,40 @@ class TextSpan:
     styling. `spans` is the source of truth for rendering; TextBlock's own
     text/font_id/font_size/color fields mirror the first span purely so
     code that only cares about line-level approximations (search,
-    plain-text export) doesn't need to special-case an empty spans list."""
+    plain-text export) doesn't need to special-case an empty spans list.
+
+    `letter_spacing` is MEASURED genuine PDF character spacing (Tc), in px,
+    from `typography/character_spacing.py` (Rendering Accuracy v1, Issue
+    002B) — real document typography (the author's tracking), not a
+    width-fitting estimate. Zero unless the measurement confidently detected
+    a constant per-glyph offset; the Adaptive Reconstruction Engine consumes
+    it as a known input rather than re-deriving it from residual error."""
 
     text: str
     font_id: str | None = None
     font_size: float = 0.0
     color: str = "#000000"
+    letter_spacing: float = 0.0
+    # Baseline rise (px, positive = raised ABOVE the line's main baseline),
+    # MEASURED from texttrace glyph origins (Renderer Geometry Investigation:
+    # a display line rendered `the` 10.86px above its line baseline — inline
+    # flow cannot express this; it must reach the renderer as data). 0.0 when
+    # the span sits on the line baseline or the line couldn't be matched.
+    rise: float = 0.0
 
     def to_dict(self) -> dict:
-        return {"text": self.text, "font_id": self.font_id, "font_size": self.font_size, "color": self.color}
+        return {
+            "text": self.text,
+            "font_id": self.font_id,
+            "font_size": self.font_size,
+            "color": self.color,
+            "letter_spacing": self.letter_spacing,
+            "rise": self.rise,
+        }
 
     @classmethod
     def from_dict(cls, data: dict) -> "TextSpan":
-        return cls(**data)
+        return cls(**{"letter_spacing": 0.0, "rise": 0.0, **data})
 
 
 @dataclass

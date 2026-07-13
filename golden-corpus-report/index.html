@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>RVF Report</title>
+<style>
+ body{font:14px system-ui,sans-serif;margin:0;background:#0f1115;color:#e6e6e6}
+ header{padding:20px 28px;background:#151922;border-bottom:1px solid #262b36}
+ h1{margin:0 0 6px;font-size:20px} .prov{color:#8b93a1;font-size:12px}
+ .tiles{display:flex;flex-wrap:wrap;gap:12px;padding:20px 28px}
+ .tile{background:#1a1f29;border:1px solid #262b36;border-radius:10px;padding:14px 18px;min-width:130px}
+ .tile.warn{border-color:#7a4a12;background:#241a10}
+ .tile .v{font-size:22px;font-weight:600} .tile .l{color:#8b93a1;font-size:12px;margin-top:4px}
+ table{width:100%;border-collapse:collapse;font-size:13px}
+ th,td{padding:8px 10px;text-align:right;border-bottom:1px solid #21262f} th{color:#8b93a1;text-align:right;position:sticky;top:0;background:#151922}
+ td:first-child,th:first-child{text-align:left}
+ .ok{color:#4ec06e} .fail{color:#e0564b}
+ .regressions{margin:0 28px;padding:14px 18px;background:#241a10;border:1px solid #7a4a12;border-radius:10px}
+ .wrap{padding:12px 28px 40px} .scroll{overflow-x:auto;border:1px solid #262b36;border-radius:10px}
+</style></head><body>
+<header><h1>Rendering Validation Framework — Benchmark Report</h1><div class="prov">timestamp: 2026-07-12T11:11:37.230825+00:00 · rvf_version: 0.1 · layoutforge_version: 0.1.0 · git_commit: 3a37492 · lfs_version: 1.0 · rich_idm_version: 0.3 · writer_version: 0.1 · os: Windows-11-10.0.26200-SP0 · python: 3.13.5</div></header>
+<div class="tiles"><div class="tile warn"><div class="v">not certified</div><div class="l">Core v1</div></div><div class="tile"><div class="v">1</div><div class="l">Documents</div></div><div class="tile"><div class="v">1</div><div class="l">Succeeded</div></div><div class="tile"><div class="v">0</div><div class="l">Failed</div></div><div class="tile"><div class="v">100.0000%</div><div class="l">Unicode fidelity</div></div><div class="tile"><div class="v">0</div><div class="l">Chars lost</div></div><div class="tile"><div class="v">1/1</div><div class="l">Legacy↔semantic parity</div></div><div class="tile warn"><div class="v">0/1</div><div class="l">Quality pass</div></div><div class="tile warn"><div class="v">3</div><div class="l">Open issues</div></div><div class="tile"><div class="v">844</div><div class="l">Span reduction</div></div><div class="tile"><div class="v">103.8s</div><div class="l">Total time</div></div></div>
+
+<div class="wrap"><h2>By category</h2><div class="scroll"><table><thead><tr><th>Category</th><th>Docs</th><th>OK</th><th>Quality pass</th><th>Chars</th><th>Lost</th><th>Escalation</th><th>Confidence</th><th>Time</th></tr></thead><tbody><tr><td>uncategorized</td><td>1</td><td>1</td><td>0</td><td>4,828</td><td>0</td><td>42.64%</td><td>0.984</td><td>103.8s</td></tr></tbody></table></div></div>
+<div class="wrap"><h2>Failure clusters</h2><div class="scroll"><table><thead><tr><th>Cluster</th><th>Stage</th><th>Sev</th><th>Docs</th><th>Categories</th><th>Occurrences</th><th>Max cat %</th><th>Significant</th></tr></thead><tbody><tr><td>scorecard:glyph_escalation_rate</td><td>font_metrics</td><td>P2</td><td>1</td><td>uncategorized</td><td>1</td><td>100%</td><td>✔</td></tr><tr><td>scorecard:mean_reconstruction_confidence</td><td>font_metrics</td><td>P2</td><td>1</td><td>uncategorized</td><td>1</td><td>100%</td><td>✔</td></tr><tr><td>scorecard:mean_width_error_px</td><td>font_metrics</td><td>P2</td><td>1</td><td>uncategorized</td><td>1</td><td>100%</td><td>✔</td></tr></tbody></table></div></div>
+<div class="wrap"><h2>Documents</h2><div class="scroll"><table><thead><tr><th>Document</th><th>Status</th><th>Pages</th><th>Chars</th><th>Lost</th><th>Subst.</th><th>Paras</th><th>Runs</th><th>Legacy spans</th><th>Semantic spans</th><th>Δ spans</th><th>CSS</th><th>Parity</th><th>Time</th></tr></thead><tbody><tr><td>9798225071486_10_07.pdf</td><td><span class="ok">ok</span></td><td>40</td><td>4,828</td><td>0</td><td>0</td><td>58</td><td>202</td><td>1,039</td><td>195</td><td>844</td><td>20</td><td>✓</td><td>103.85s</td></tr></tbody></table></div></div>
+</body></html>

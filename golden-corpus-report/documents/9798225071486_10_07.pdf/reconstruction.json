@@ -1,0 +1,28 @@
+{
+  "structure": {
+    "regions": 33,
+    "paragraphs": 58,
+    "lines": 189,
+    "runs": 202,
+    "low_confidence_paragraphs": 0
+  },
+  "reconstruction_profile": {
+    "words": 1039,
+    "by_mode": {
+      "word": 596,
+      "glyph": 443
+    },
+    "by_reason": {
+      "tracking": 359,
+      "width_error": 428,
+      "kerning": 9,
+      "ligature": 6
+    },
+    "glyph_fraction": 0.4264,
+    "mean_reconstruction_confidence": 0.984,
+    "chars_total": 4828,
+    "chars_substituted": 0,
+    "chars_lost": 0,
+    "character_substitution_rate": 0.0
+  }
+}

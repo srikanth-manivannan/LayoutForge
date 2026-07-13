@@ -1,0 +1,940 @@
+{
+  "environment": {
+    "timestamp": "2026-07-12T11:11:37.230825+00:00",
+    "rvf_version": "0.1",
+    "layoutforge_version": "0.1.0",
+    "git_commit": "3a37492",
+    "lfs_version": "1.0",
+    "rich_idm_version": "0.3",
+    "writer_version": "0.1",
+    "feature_flags": {
+      "use_rich_tree": false,
+      "emit_debug_attributes": false
+    },
+    "os": "Windows-11-10.0.26200-SP0",
+    "python": "3.13.5"
+  },
+  "aggregates": {
+    "quality_passes": 0,
+    "total": 1,
+    "ok": 1,
+    "failed": 0,
+    "chars_total": 4828,
+    "chars_lost": 0,
+    "chars_substituted": 0,
+    "unicode_fidelity_pct": 100.0,
+    "unicode_parity_failures": 0,
+    "legacy_spans": 1039,
+    "semantic_spans": 195,
+    "span_reduction": 844,
+    "largest_page_spans": 20,
+    "low_confidence_paragraphs": 0,
+    "total_seconds": 103.845,
+    "total_issues": 3,
+    "issues_by_category": {
+      "Rendering": 3
+    },
+    "issues_by_severity": {
+      "P2": 3
+    },
+    "by_category": {
+      "uncategorized": {
+        "documents": 1,
+        "ok": 1,
+        "quality_passes": 0,
+        "chars_total": 4828,
+        "chars_lost": 0,
+        "mean_glyph_escalation": 0.4264,
+        "mean_confidence": 0.984,
+        "total_seconds": 103.85
+      }
+    },
+    "clusters": [
+      {
+        "code": "scorecard:glyph_escalation_rate",
+        "stage": "font_metrics",
+        "category": "Rendering",
+        "severity": "P2",
+        "document_count": 1,
+        "documents": [
+          "9798225071486_10_07.pdf"
+        ],
+        "categories": [
+          "uncategorized"
+        ],
+        "occurrences": 1,
+        "max_category_fraction": 1.0,
+        "significant": true
+      },
+      {
+        "code": "scorecard:mean_reconstruction_confidence",
+        "stage": "font_metrics",
+        "category": "Rendering",
+        "severity": "P2",
+        "document_count": 1,
+        "documents": [
+          "9798225071486_10_07.pdf"
+        ],
+        "categories": [
+          "uncategorized"
+        ],
+        "occurrences": 1,
+        "max_category_fraction": 1.0,
+        "significant": true
+      },
+      {
+        "code": "scorecard:mean_width_error_px",
+        "stage": "font_metrics",
+        "category": "Rendering",
+        "severity": "P2",
+        "document_count": 1,
+        "documents": [
+          "9798225071486_10_07.pdf"
+        ],
+        "categories": [
+          "uncategorized"
+        ],
+        "occurrences": 1,
+        "max_category_fraction": 1.0,
+        "significant": true
+      }
+    ],
+    "fidelity": {
+      "overall_passes": 0,
+      "families": {
+        "extraction": {
+          "mean_score": 1.0,
+          "gate_passes": 1,
+          "documents_with_data": 1
+        },
+        "typography": {
+          "mean_score": 0.2927,
+          "gate_passes": 0,
+          "documents_with_data": 1
+        },
+        "layout": {
+          "mean_score": 1.0,
+          "gate_passes": 1,
+          "documents_with_data": 1
+        },
+        "semantic": {
+          "mean_score": null,
+          "gate_passes": 0,
+          "documents_with_data": 0
+        },
+        "rendering": {
+          "mean_score": 0.2345,
+          "gate_passes": 0,
+          "documents_with_data": 1
+        },
+        "performance": {
+          "mean_score": 1.0,
+          "gate_passes": 1,
+          "documents_with_data": 1
+        }
+      }
+    },
+    "drift": {
+      "by_font": {
+        "Avenir-Medium": {
+          "count": 10,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "ChauncyDecaf-Medium": {
+          "count": 45,
+          "mean": 0.039,
+          "median": 0.039,
+          "p95": 0.039,
+          "max": 0.039
+        },
+        "ChauncyDecaf-Regular": {
+          "count": 1,
+          "mean": 0.0,
+          "median": 0.0,
+          "p95": 0.0,
+          "max": 0.0
+        },
+        "ChauncyPro-Bold": {
+          "count": 8,
+          "mean": 0.635,
+          "median": 0.635,
+          "p95": 0.635,
+          "max": 0.635
+        },
+        "ChauncyPro-Italic": {
+          "count": 3,
+          "mean": 0.055,
+          "median": 0.055,
+          "p95": 0.055,
+          "max": 0.055
+        },
+        "ChauncyPro-Regular": {
+          "count": 765,
+          "mean": 0.279,
+          "median": 0.279,
+          "p95": 0.279,
+          "max": 0.279
+        },
+        "KGDancingontheRooftop": {
+          "count": 22,
+          "mean": 10.559,
+          "median": 10.559,
+          "p95": 10.559,
+          "max": 10.559
+        },
+        "Palatino-Italic": {
+          "count": 3,
+          "mean": 0.003,
+          "median": 0.003,
+          "p95": 0.003,
+          "max": 0.003
+        },
+        "Palatino-Roman": {
+          "count": 181,
+          "mean": 0.144,
+          "median": 0.144,
+          "p95": 0.144,
+          "max": 0.144
+        },
+        "Palatino-Roman-SC700": {
+          "count": 1,
+          "mean": 0.003,
+          "median": 0.003,
+          "p95": 0.003,
+          "max": 0.003
+        }
+      },
+      "by_reason": {
+        "tracking": {
+          "count": 359,
+          "mean": 0.063,
+          "median": 0.063,
+          "p95": 0.063,
+          "max": 0.063,
+          "contribution_pct": 4.7
+        },
+        "width_error": {
+          "count": 428,
+          "mean": 1.018,
+          "median": 1.018,
+          "p95": 1.018,
+          "max": 1.018,
+          "contribution_pct": 91.0
+        },
+        "none": {
+          "count": 237,
+          "mean": 0.009,
+          "median": 0.009,
+          "p95": 0.009,
+          "max": 0.009,
+          "contribution_pct": 0.4
+        },
+        "kerning": {
+          "count": 9,
+          "mean": 1.069,
+          "median": 1.069,
+          "p95": 1.069,
+          "max": 1.069,
+          "contribution_pct": 2.0
+        },
+        "ligature": {
+          "count": 6,
+          "mean": 1.457,
+          "median": 1.457,
+          "p95": 1.457,
+          "max": 1.457,
+          "contribution_pct": 1.8
+        }
+      }
+    },
+    "typography": {
+      "fonts": [
+        {
+          "family": "ChauncyPro-Bold",
+          "font_class": "handwriting",
+          "documents": 1,
+          "words": 8,
+          "median_drift_px": 0.744,
+          "p95_drift_px": 1.271,
+          "escalation_rate": 0.625,
+          "reason_pct": {
+            "tracking": 12.5,
+            "width_error": 62.5,
+            "none": 25.0
+          },
+          "subset_seen": false,
+          "gpos_kerning": false,
+          "kern_table": false,
+          "gsub_ligatures": false
+        },
+        {
+          "family": "ChauncyPro-Regular",
+          "font_class": "handwriting",
+          "documents": 1,
+          "words": 765,
+          "median_drift_px": 0.282,
+          "p95_drift_px": 0.701,
+          "escalation_rate": 0.5412,
+          "reason_pct": {
+            "width_error": 53.7,
+            "none": 0.1,
+            "tracking": 45.8,
+            "ligature": 0.4
+          },
+          "subset_seen": false,
+          "gpos_kerning": false,
+          "kern_table": false,
+          "gsub_ligatures": false
+        },
+        {
+          "family": "KGDancingontheRooftop",
+          "font_class": "handwriting",
+          "documents": 1,
+          "words": 22,
+          "median_drift_px": 0.012,
+          "p95_drift_px": 102.375,
+          "escalation_rate": 0.2727,
+          "reason_pct": {
+            "width_error": 9.1,
+            "kerning": 18.2,
+            "none": 54.5,
+            "tracking": 18.2
+          },
+          "subset_seen": false,
+          "gpos_kerning": false,
+          "kern_table": false,
+          "gsub_ligatures": false
+        },
+        {
+          "family": "Palatino-Roman-SC700",
+          "font_class": "serif",
+          "documents": 1,
+          "words": 1,
+          "median_drift_px": 0.003,
+          "p95_drift_px": 0.003,
+          "escalation_rate": 0.0,
+          "reason_pct": {
+            "none": 100.0
+          },
+          "subset_seen": false,
+          "gpos_kerning": false,
+          "kern_table": false,
+          "gsub_ligatures": false
+        },
+        {
+          "family": "Palatino-Italic",
+          "font_class": "serif",
+          "documents": 1,
+          "words": 3,
+          "median_drift_px": 0.002,
+          "p95_drift_px": 0.005,
+          "escalation_rate": 0.0,
+          "reason_pct": {
+            "none": 100.0
+          },
+          "subset_seen": false,
+          "gpos_kerning": false,
+          "kern_table": false,
+          "gsub_ligatures": false
+        },
+        {
+          "family": "Palatino-Roman",
+          "font_class": "serif",
+          "documents": 1,
+          "words": 181,
+          "median_drift_px": 0.001,
+          "p95_drift_px": 1.632,
+          "escalation_rate": 0.0939,
+          "reason_pct": {
+            "none": 90.1,
+            "kerning": 2.8,
+            "width_error": 5.0,
+            "ligature": 1.7,
+            "tracking": 0.6
+          },
+          "subset_seen": false,
+          "gpos_kerning": false,
+          "kern_table": false,
+          "gsub_ligatures": false
+        },
+        {
+          "family": "ChauncyPro-Italic",
+          "font_class": "handwriting",
+          "documents": 1,
+          "words": 3,
+          "median_drift_px": 0.0,
+          "p95_drift_px": 0.165,
+          "escalation_rate": 0.0,
+          "reason_pct": {
+            "tracking": 100.0
+          },
+          "subset_seen": false,
+          "gpos_kerning": false,
+          "kern_table": false,
+          "gsub_ligatures": false
+        },
+        {
+          "family": "ChauncyDecaf-Medium",
+          "font_class": "handwriting",
+          "documents": 1,
+          "words": 45,
+          "median_drift_px": 0.0,
+          "p95_drift_px": 0.0,
+          "escalation_rate": 0.0222,
+          "reason_pct": {
+            "none": 97.8,
+            "width_error": 2.2
+          },
+          "subset_seen": false,
+          "gpos_kerning": false,
+          "kern_table": false,
+          "gsub_ligatures": false
+        },
+        {
+          "family": "ChauncyDecaf-Regular",
+          "font_class": "handwriting",
+          "documents": 1,
+          "words": 1,
+          "median_drift_px": 0.0,
+          "p95_drift_px": 0.0,
+          "escalation_rate": 0.0,
+          "reason_pct": {
+            "none": 100.0
+          },
+          "subset_seen": false,
+          "gpos_kerning": false,
+          "kern_table": false,
+          "gsub_ligatures": false
+        },
+        {
+          "family": "Avenir-Medium",
+          "font_class": "sans",
+          "documents": 1,
+          "words": 10,
+          "median_drift_px": 0.0,
+          "p95_drift_px": 0.0,
+          "escalation_rate": 0.0,
+          "reason_pct": {
+            "none": 100.0
+          },
+          "subset_seen": false,
+          "gpos_kerning": false,
+          "kern_table": false,
+          "gsub_ligatures": false
+        }
+      ],
+      "classes": {
+        "handwriting": {
+          "words": 844,
+          "median_drift_px": 0.253,
+          "p95_drift_px": 0.713,
+          "escalation_rate": 0.5047
+        },
+        "sans": {
+          "words": 10,
+          "median_drift_px": 0.0,
+          "p95_drift_px": 0.0,
+          "escalation_rate": 0.0
+        },
+        "serif": {
+          "words": 185,
+          "median_drift_px": 0.001,
+          "p95_drift_px": 1.632,
+          "escalation_rate": 0.0919
+        }
+      },
+      "drift_histogram": {
+        "0-0.1": 467,
+        "0.1-0.2": 92,
+        "0.2-0.5": 328,
+        "0.5-1.0": 116,
+        ">1.0": 36
+      },
+      "escalation_histogram": {
+        "0-0.05": 6,
+        "0.05-0.1": 1,
+        "0.1-0.25": 0,
+        "0.25-0.5": 1,
+        ">0.5": 2
+      },
+      "gpos_candidates": [],
+      "gsub_candidates": [],
+      "worst_fonts": [
+        "ChauncyPro-Regular",
+        "KGDancingontheRooftop",
+        "Palatino-Roman",
+        "ChauncyDecaf-Medium"
+      ],
+      "most_stable_fonts": [
+        "ChauncyDecaf-Medium",
+        "Palatino-Roman",
+        "KGDancingontheRooftop",
+        "ChauncyPro-Regular"
+      ]
+    },
+    "certification": {
+      "certified": false,
+      "criteria": {
+        "no_p0_issues": {
+          "pass": true,
+          "detail": "0 P0 (release-blocking)"
+        },
+        "no_p1_issues": {
+          "pass": true,
+          "detail": "0 P1 (release-blocking)"
+        },
+        "no_pipeline_failures": {
+          "pass": true,
+          "detail": "0 failed"
+        },
+        "quality_all_pass": {
+          "pass": false,
+          "detail": "0/1 scorecards pass"
+        },
+        "semantic_parity": {
+          "pass": true,
+          "detail": "0 parity failures"
+        }
+      }
+    }
+  },
+  "regressions": [],
+  "documents": [
+    {
+      "name": "9798225071486_10_07.pdf",
+      "ok": true,
+      "error": null,
+      "pages": 40,
+      "extraction": {
+        "chars_total": 4828,
+        "chars_substituted": 0,
+        "fonts_total": 12,
+        "fonts_with_file": 12,
+        "images_total": 43,
+        "shapes_total": 0
+      },
+      "fidelity": {
+        "chars_total": 4828,
+        "chars_substituted": 0,
+        "chars_lost": 0,
+        "substitution_rate": 0.0
+      },
+      "structure": {
+        "regions": 33,
+        "paragraphs": 58,
+        "lines": 189,
+        "runs": 202,
+        "low_confidence_paragraphs": 0
+      },
+      "rendering": {
+        "legacy_spans": 1039,
+        "semantic_spans": 195,
+        "span_reduction": 844,
+        "css_rules": 20,
+        "semantic_html_bytes": 163871,
+        "largest_page_spans": 20
+      },
+      "performance": {
+        "stage_seconds": {
+          "validate": 0.0407,
+          "metadata": 0.06,
+          "render_background": 14.8711,
+          "extract_fonts": 25.0917,
+          "extract_images": 60.0348,
+          "extract_text": 1.2256,
+          "normalize_idm": 0.925,
+          "reconstruct_tree": 0.1375,
+          "validate_idm": 0.0107,
+          "quality_accounting": 0.0108,
+          "persist_assets": 0.7477,
+          "generate_css": 0.1587,
+          "generate_html": 0.4703,
+          "generate_semantic_html": 0.0608
+        },
+        "total_seconds": 103.8454
+      },
+      "quality": {
+        "overall_pass": false,
+        "scorecard": {
+          "character_fidelity_pct": {
+            "target": 100.0,
+            "current": 100.0,
+            "pass": true
+          },
+          "unicode_fidelity_pct": {
+            "target": 100.0,
+            "current": 100.0,
+            "pass": true
+          },
+          "lexical_conservation_pct": {
+            "target": 100.0,
+            "current": 100.0,
+            "pass": true
+          },
+          "font_resolution_pct": {
+            "target": 99.9,
+            "current": 100.0,
+            "pass": true
+          },
+          "glyph_escalation_rate": {
+            "target": 0.1,
+            "current": 0.4264,
+            "pass": false
+          },
+          "mean_reconstruction_confidence": {
+            "target": 0.99,
+            "current": 0.984,
+            "pass": false
+          },
+          "mean_width_error_px": {
+            "target": 0.25,
+            "current": 0.461,
+            "pass": false
+          },
+          "validator_errors": {
+            "target": 0,
+            "current": 0,
+            "pass": true
+          }
+        },
+        "stages": [
+          {
+            "stage": "run_builder",
+            "metric": "characters",
+            "expected": 5711,
+            "observed": 5711,
+            "delta": 0,
+            "confidence": 1.0
+          },
+          {
+            "stage": "word_builder",
+            "metric": "lexical_characters",
+            "expected": 4828,
+            "observed": 4828,
+            "delta": 0,
+            "confidence": 1.0
+          },
+          {
+            "stage": "paragraph_builder",
+            "metric": "lines",
+            "expected": 189,
+            "observed": 189,
+            "delta": 0,
+            "confidence": 1.0
+          },
+          {
+            "stage": "font_resolution",
+            "metric": "runs_with_font",
+            "expected": 202,
+            "observed": 202,
+            "delta": 0,
+            "confidence": 1.0
+          }
+        ]
+      },
+      "document_fidelity": {
+        "families": {
+          "extraction": {
+            "family": "extraction",
+            "gate_pass": true,
+            "gates_overall": true,
+            "score": 1.0,
+            "metrics": [
+              {
+                "metric": "character_fidelity_pct",
+                "current": 100.0,
+                "target": 100.0,
+                "pass": true,
+                "confidence": 1.0,
+                "source": "conservation_ledger",
+                "unit": "%"
+              },
+              {
+                "metric": "unicode_fidelity_pct",
+                "current": 100.0,
+                "target": 100.0,
+                "pass": true,
+                "confidence": 1.0,
+                "source": "conservation_ledger",
+                "unit": "%"
+              },
+              {
+                "metric": "font_resolution_pct",
+                "current": 100.0,
+                "target": 99.9,
+                "pass": true,
+                "confidence": 1.0,
+                "source": "conservation_ledger",
+                "unit": "%"
+              },
+              {
+                "metric": "image_fidelity_pct",
+                "current": null,
+                "target": 99.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "%"
+              },
+              {
+                "metric": "shape_fidelity_pct",
+                "current": null,
+                "target": 99.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "%"
+              },
+              {
+                "metric": "metadata_fidelity_pct",
+                "current": null,
+                "target": 100.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "%"
+              }
+            ]
+          },
+          "typography": {
+            "family": "typography",
+            "gate_pass": false,
+            "gates_overall": true,
+            "score": 0.2927,
+            "metrics": [
+              {
+                "metric": "baseline_error_px",
+                "current": 0.001,
+                "target": 0.5,
+                "pass": true,
+                "confidence": 0.85,
+                "source": "static_geometry_model",
+                "unit": "px"
+              },
+              {
+                "metric": "line_height_deviation_px",
+                "current": 1.708,
+                "target": 0.5,
+                "pass": false,
+                "confidence": 0.95,
+                "source": "static_geometry",
+                "unit": "px"
+              },
+              {
+                "metric": "word_drift_px",
+                "current": 0.163,
+                "target": 0.25,
+                "pass": true,
+                "confidence": 0.8,
+                "source": "static_geometry",
+                "unit": "px"
+              },
+              {
+                "metric": "tracking_residual_px",
+                "current": 0.0,
+                "target": 0.5,
+                "pass": true,
+                "confidence": 0.9,
+                "source": "reconstruction_profile",
+                "unit": "px"
+              },
+              {
+                "metric": "kerning_error_px",
+                "current": null,
+                "target": 0.25,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "px"
+              },
+              {
+                "metric": "letter_spacing_error_px",
+                "current": null,
+                "target": 0.25,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "px"
+              }
+            ]
+          },
+          "layout": {
+            "family": "layout",
+            "gate_pass": true,
+            "gates_overall": true,
+            "score": 1.0,
+            "metrics": [
+              {
+                "metric": "paragraph_rhythm_px",
+                "current": 0.0,
+                "target": 1.0,
+                "pass": true,
+                "confidence": 0.9,
+                "source": "static_geometry",
+                "unit": "px"
+              },
+              {
+                "metric": "margin_error_px",
+                "current": null,
+                "target": 1.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "px"
+              },
+              {
+                "metric": "alignment_error_px",
+                "current": null,
+                "target": 1.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "px"
+              },
+              {
+                "metric": "column_accuracy_pct",
+                "current": null,
+                "target": 99.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "%"
+              }
+            ]
+          },
+          "semantic": {
+            "family": "semantic",
+            "gate_pass": null,
+            "gates_overall": false,
+            "score": null,
+            "metrics": [
+              {
+                "metric": "reading_order_accuracy_pct",
+                "current": null,
+                "target": 99.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "%"
+              },
+              {
+                "metric": "paragraph_accuracy_pct",
+                "current": null,
+                "target": 99.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "%"
+              },
+              {
+                "metric": "list_accuracy_pct",
+                "current": null,
+                "target": 99.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "%"
+              },
+              {
+                "metric": "table_accuracy_pct",
+                "current": null,
+                "target": 99.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "%"
+              },
+              {
+                "metric": "heading_accuracy_pct",
+                "current": null,
+                "target": 99.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "%"
+              }
+            ]
+          },
+          "rendering": {
+            "family": "rendering",
+            "gate_pass": false,
+            "gates_overall": true,
+            "score": 0.2345,
+            "metrics": [
+              {
+                "metric": "glyph_escalation_rate",
+                "current": 0.4264,
+                "target": 0.1,
+                "pass": false,
+                "confidence": 1.0,
+                "source": "reconstruction_profile",
+                "unit": ""
+              },
+              {
+                "metric": "mean_reconstruction_confidence",
+                "current": 0.984,
+                "target": 0.99,
+                "pass": false,
+                "confidence": 1.0,
+                "source": "reconstruction_profile",
+                "unit": ""
+              },
+              {
+                "metric": "browser_geometry_error_px",
+                "current": null,
+                "target": 0.25,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "px"
+              },
+              {
+                "metric": "pixel_fidelity_pct",
+                "current": null,
+                "target": 99.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "%"
+              }
+            ]
+          },
+          "performance": {
+            "family": "performance",
+            "gate_pass": true,
+            "gates_overall": false,
+            "score": 1.0,
+            "metrics": [
+              {
+                "metric": "seconds_per_page",
+                "current": 2.596,
+                "target": 5.0,
+                "pass": true,
+                "confidence": 1.0,
+                "source": "rvf",
+                "unit": "s"
+              },
+              {
+                "metric": "peak_memory_mb_per_100_pages",
+                "current": null,
+                "target": 500.0,
+                "pass": null,
+                "confidence": 0.0,
+                "source": "reserved",
+                "unit": "MB"
+              }
+            ]
+          }
+        },
+        "overall": {
+          "pass": false,
+          "score": 0.2345,
+          "gating": "AND over critical families (extraction, typography, layout, rendering)"
+        }
+      }
+    }
+  ]
+}

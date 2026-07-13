@@ -36,6 +36,14 @@ class Settings(BaseSettings):
     preview_dpi: Literal[72, 150, 300, 600] = 300
     jpeg_quality: int = 85
 
+    # Rich-IDM semantic writer (ADR-011, Phase 3b). OFF by default: the legacy
+    # fixed-layout HTML is still the runtime output. When on, the semantic
+    # writer renders page.regions into a parallel pages_semantic/ tree for
+    # golden-corpus parity comparison — no production behavior changes until
+    # parity is proven and the legacy path is retired (Phase 4).
+    use_rich_tree: bool = False
+    emit_debug_attributes: bool = False
+
     @property
     def projects_dir(self) -> Path:
         return self.storage_root / "projects"

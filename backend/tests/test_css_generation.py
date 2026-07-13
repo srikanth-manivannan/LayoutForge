@@ -6,6 +6,7 @@ from app.pipeline.stages.extract_images import ExtractImagesStage
 from app.pipeline.stages.extract_text import ExtractTextStage
 from app.pipeline.stages.generate_css import GenerateCssStage
 from app.pipeline.stages.normalize_idm import NormalizeIdmStage
+from app.pipeline.stages.reconstruct_tree import ReconstructTreeStage
 from app.pipeline.stages.render_backgrounds import RenderBackgroundsStage
 from app.repositories.sqlite.page_repository import SQLitePageRepository
 from app.services.storage_service import StorageService
@@ -18,6 +19,7 @@ def run_extraction(context, storage) -> None:
     ExtractImagesStage(storage).run(context)
     ExtractTextStage().run(context)
     NormalizeIdmStage().run(context)
+    ReconstructTreeStage().run(context)  # RIL consumes the Rich IDM tree
 
 
 def test_css_output_writes_common_and_per_page_files(db_session, tmp_path: Path, rich_pdf_path: Path) -> None:
@@ -32,21 +34,26 @@ def test_css_output_writes_common_and_per_page_files(db_session, tmp_path: Path,
     assert (css_dir / "page_0002.css").exists()
 
     common_css = (css_dir / "common.css").read_text(encoding="utf-8")
-    # The fixture's text uses base-14 font aliases (non-embedded), so no
-    # @font-face rule is expected here — see test_css_output_emits_font_face
-    # for the embedded-font path.
     assert ".lf-page {" in common_css
-    assert ".lf-text-block {" in common_css
+    # RIL DOM base rules replace the legacy .lf-text-block.
+    assert ".lf-paragraph {" in common_css
+    assert ".lf-line" not in common_css  # R-2: lines are engine-only
+    assert ".lf-text-block" not in common_css
+
+    # Text geometry/styles moved to the Render Tree (inline geometry +
+    # registry classes) — per-block #tb rules are retired.
+    page_css = (css_dir / "page_0001.css").read_text(encoding="utf-8")
+    assert "#tb-" not in page_css
 
     page_one = context.document.get_page(1)
-    page_css = (css_dir / "page_0001.css").read_text(encoding="utf-8")
-    heading = next(b for b in page_one.text_blocks if b.text == "Page 1 heading")
-    assert f"#tb-{heading.id}" in page_css
-    assert f"left: {heading.bbox.x:g}px" in page_css
-    assert f"top: {heading.bbox.y:g}px" in page_css
-
     image = page_one.images[0]
     assert f"#img-{image.id}" in page_css
+
+    # The CSS plugin built + validated the Render Trees and left them in
+    # scratch for the HTML compiler. Rendering Stabilization phase: no
+    # Style Registry — every element gets a complete inline style instead.
+    assert set(context.scratch["ril_trees"].keys()) == {1, 2}
+    assert "ril_style_registry" not in context.scratch
 
 
 def test_generate_css_stage_persists_page_css_path(db_session, tmp_path: Path, rich_pdf_path: Path) -> None:
@@ -96,7 +103,27 @@ def test_css_output_emits_font_face_for_embedded_fonts() -> None:
     assert css.count("@font-face") == 1
 
 
-def test_rotated_text_block_gets_rotation_transform(db_session, tmp_path: Path) -> None:
+def test_no_typography_registry_classes_land_in_common_css(db_session, tmp_path: Path) -> None:
+    """Rendering Stabilization phase (temporary, 2026-07-13): the Style
+    Registry is bypassed — common.css carries only structural rules
+    (page/region/paragraph mechanics, @font-face), never per-style dedup
+    classes. Every element's typography is inline (see test_ril.py)."""
+    from tests.conftest import make_multicolor_line_pdf_bytes
+
+    pdf_path = tmp_path / "multicolor.pdf"
+    pdf_path.write_bytes(make_multicolor_line_pdf_bytes())
+    context, storage, page_repo, _ = make_context_with_metadata(db_session, tmp_path, pdf_path)
+    run_extraction(context, storage)
+
+    GenerateCssStage(page_repo, storage).run(context)
+
+    common_css = (storage.project_dir(context.project_id) / "resources" / "css" / "common.css").read_text(encoding="utf-8")
+    assert "Style Registry" not in common_css
+    assert ".lf-p0" not in common_css
+    assert ".lf-r0" not in common_css and ".lf-r1" not in common_css
+
+
+def test_rotated_line_gets_rotation_transform(db_session, tmp_path: Path) -> None:
     from tests.conftest import make_rich_pdf_bytes
 
     pdf_path = tmp_path / "rotated.pdf"
@@ -106,10 +133,15 @@ def test_rotated_text_block_gets_rotation_transform(db_session, tmp_path: Path) 
 
     GenerateCssStage(page_repo, storage).run(context)
 
-    css_dir = storage.project_dir(context.project_id) / "resources" / "css"
-    page_css = (css_dir / "page_0001.css").read_text(encoding="utf-8")
     page_one = context.document.get_page(1)
     rotated_block = next((b for b in page_one.text_blocks if b.rotation), None)
     if rotated_block is not None:
-        assert f"#tb-{rotated_block.id}" in page_css
-        assert "transform: rotate(" in page_css
+        # Rotation now lives on the Render Tree's line geometry (decided in
+        # the Instruction Builder, emitted inline by the compiler).
+        tree = context.scratch["ril_trees"][1]
+        rotated = [
+            line for para in tree.children for line in para.children
+            if "transform" in line.geometry
+        ]
+        assert rotated, "rotated line must carry a rotate() transform in its geometry"
+        assert any("rotate(" in line.geometry["transform"] for line in rotated)

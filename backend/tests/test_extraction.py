@@ -157,8 +157,11 @@ def test_persist_assets_deduplicates_against_existing_db_row(db_session, tmp_pat
 
     assets = asset_repo.list_by_project(context.project_id)
     image_assets = [a for a in assets if a.type.value == "image"]
-    # 2 page backgrounds + 1 deduplicated embedded image
-    assert len(image_assets) == 3
+    # Backgrounds are now text-redacted (2026-07-13) — the fixture's two
+    # pages differ ONLY by their heading text ("Page 1/2 heading"), so with
+    # text stripped the two backgrounds are pixel-identical and legitimately
+    # dedup to 1, plus the 1 deduplicated embedded image = 2 total.
+    assert len(image_assets) == 2
 
     shared_image = next(a for a in image_assets if a.original_object_id is not None)
     assert sorted(asset_repo.list_pages_for_asset(shared_image.id)) == [1, 2]

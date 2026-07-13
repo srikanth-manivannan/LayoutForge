@@ -10,6 +10,17 @@ pipeline. It is the single agreement between the **Engine**, **Viewer**,
 and writes the model defined here and nothing implicit. Persisted form is
 `idm.json`; a per-conversion `report.json` carries analytics/telemetry.
 
+## Guiding principle (normative)
+
+> **Every stage must be measurable. Every decision must be explainable. Every
+> transformation must be reversible until rendering.**
+
+This one sentence underwrites the whole platform: the Rich IDM (nothing
+implicit), Reconstruction Decisions (§3, explainable), the Validator (§8), and
+Quality Accounting (§7, measurable) all exist to satisfy it. Rendering is the
+first irreversible step — everything before it retains enough information to be
+re-derived, re-explained, or re-emitted to another format.
+
 ## 0. Reconstruction pipeline (normative shape)
 
 ```
@@ -141,6 +152,38 @@ Every node carries a stable `id` (one selection pipeline) and a
 confidence/reason in the ReconstructionDecision vocabulary (§3), so editing,
 validation, and AI read one contract.
 
+**Normative rules for the Intelligence Layer (ADR-011):**
+- **Semantics come only from layout evidence — never from PDF drawing
+  operators.** A structure (paragraph, list, table, heading) **MUST** be
+  inferred from measured geometry/typography, not from the fact that a
+  content-stream operator changed. Operators mark *rendering*, not *meaning*.
+- **A Run is the maximal sequence of glyphs that render identically** — same
+  *visual* identity (normalized family, weight, italic, stretch, color,
+  opacity, size, render mode, writing mode, direction, decoration, language),
+  **not** the same PDF font object. Subset name and font object id **MUST
+  NOT** affect run identity; a genuine style change **MUST** split a run,
+  even mid-word.
+- **Words are reconstructed from the run stream, not from extraction.** A Word
+  is the maximal non-whitespace token over a Line's runs; PyMuPDF
+  `get_text("words")` are geometry *hints* only and **MUST NOT** define word
+  text or boundaries. A word **MUST NOT** cross a run boundary as a unit — a
+  mixed-style word (`Times`, `theToad`, `H₂O`) is represented as ordered
+  `WordFragment`s that reference runs, so `"".join(fragment.text) == word.text`
+  and no character is duplicated or reordered. Words own geometry; runs own
+  style; whitespace is never lost (it stays in the run text).
+- **Grouping is evidence-accumulating.** Paragraph/region grouping **MUST**
+  combine multiple weighted layout signals (baseline rhythm, spacing, indent,
+  alignment, direction, font/language continuity, hyphenation, list/number
+  markers, line fill, reading order), not a single rule, and record the
+  `confidence` and contributing `signals` on the node.
+- **Stable IDs are created once and never regenerated** — reconstruction
+  assigns each Paragraph/Region/Line/Run/Word/Glyph a permanent id so
+  editing, comments, AI suggestions, validation findings, compare mode, and
+  collaboration reference a fixed identity.
+- **The renderer never repairs the model.** If a writer would have to merge
+  spans, guess a paragraph, or recover a glyph, the defect belongs to an
+  earlier stage (Extraction → Typography → Intelligence), not the writer.
+
 ## 6. Math — Reserved (M7)
 
 *Reserved.* Fallback ladder (ADR-004): full MathML → partial MathML → SVG →
@@ -153,6 +196,23 @@ cropped raster. Malformed MathML **MUST NOT** be emitted.
 - `report.json` (per conversion): the profile + accuracy summary +
   per-stage timing and peak memory. Releases **SHOULD** be compared on this
   telemetry (e.g. kerning% over versions).
+- **Quality accounting (Phase 2.7):** each reconstruction stage reports
+  `{expected, observed, delta, confidence}` (a conservation ledger), plus a
+  release **scorecard** (character/unicode fidelity, lexical conservation,
+  font resolution, validator errors) with `{target, current, pass}` and an
+  `overall_pass`. A confidence drop identifies the **first** stage that lost
+  information, not merely where a defect became visible. Stored in
+  `document.quality` (→ `idm.json`/`report.json`).
+
+## 7a. Asset Policy — Reserved-normative (Phase 2.8, image optimization)
+
+Extracted rasters **MUST** preserve the original asset losslessly (for
+future EPUB/PDF export), and the renderer **MUST** consume an optimized
+**working copy** whose area does not exceed **400,000 px** (e.g. 1200×1200 →
+632×632), scaled **proportionally** — never stretched. Both the original and
+the working copy **MUST** be recorded in the asset manifest with their
+dimensions and a content hash. This keeps HTML light and preview RAM low
+without sacrificing archival quality.
 
 ## 8. Validation — normative surface, rules grow per milestone
 

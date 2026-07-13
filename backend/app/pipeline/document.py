@@ -43,6 +43,12 @@ class Document:
     # mean confidence across the document. Diagnostic, not user-facing —
     # feeds engine tuning and Validation. Empty until reconstruction runs.
     reconstruction_profile: dict = field(default_factory=dict)
+    # Rich IDM validation summary (Phase 2.5): structural/fidelity violations
+    # found in the tree before rendering. Empty until ValidateRichIdmStage runs.
+    idm_validation: dict = field(default_factory=dict)
+    # Measured quality (Phase 2.7): per-stage conservation ledger + release
+    # scorecard. Empty until QualityAccountingStage runs.
+    quality: dict = field(default_factory=dict)
 
     def get_page(self, number: int) -> Page | None:
         for page in self.pages:
@@ -58,6 +64,8 @@ class Document:
             "fonts": [f.to_dict() for f in self.fonts],
             "assets": [a.to_dict() for a in self.assets],
             "reconstruction_profile": self.reconstruction_profile,
+            "idm_validation": self.idm_validation,
+            "quality": self.quality,
         }
 
     @classmethod
@@ -69,4 +77,6 @@ class Document:
             fonts=[FontResource.from_dict(f) for f in data.get("fonts", [])],
             assets=[AssetResource.from_dict(a) for a in data.get("assets", [])],
             reconstruction_profile=data.get("reconstruction_profile", {}),
+            idm_validation=data.get("idm_validation", {}),
+            quality=data.get("quality", {}),
         )

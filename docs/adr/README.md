@@ -20,5 +20,6 @@ Format per ADR: **Context → Decision → Consequences → Status.**
 | [008](008-semantic-first-ordering.md) | Semantic-First Reconstruction Ordering | Accepted |
 | [009](009-core-v1-platform-freeze.md) | Core v1.0 Platform Freeze | Accepted (LOCKED) |
 | [010](010-character-fidelity-first.md) | Character Fidelity First | Accepted (primary Quality-Gate criterion) |
+| [011](011-parallel-rich-idm-migration.md) | Parallel Rich-IDM Migration, Renderer Interface, Strict Pipeline | Accepted |
 
 Design detail for each lives in [../design/typography/](../design/typography/00_OVERVIEW.md).

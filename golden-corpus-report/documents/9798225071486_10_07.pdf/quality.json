@@ -1,0 +1,384 @@
+{
+  "stages": [
+    {
+      "stage": "run_builder",
+      "metric": "characters",
+      "expected": 5711,
+      "observed": 5711,
+      "delta": 0,
+      "confidence": 1.0
+    },
+    {
+      "stage": "word_builder",
+      "metric": "lexical_characters",
+      "expected": 4828,
+      "observed": 4828,
+      "delta": 0,
+      "confidence": 1.0
+    },
+    {
+      "stage": "paragraph_builder",
+      "metric": "lines",
+      "expected": 189,
+      "observed": 189,
+      "delta": 0,
+      "confidence": 1.0
+    },
+    {
+      "stage": "font_resolution",
+      "metric": "runs_with_font",
+      "expected": 202,
+      "observed": 202,
+      "delta": 0,
+      "confidence": 1.0
+    }
+  ],
+  "scorecard": {
+    "character_fidelity_pct": {
+      "target": 100.0,
+      "current": 100.0,
+      "pass": true
+    },
+    "unicode_fidelity_pct": {
+      "target": 100.0,
+      "current": 100.0,
+      "pass": true
+    },
+    "lexical_conservation_pct": {
+      "target": 100.0,
+      "current": 100.0,
+      "pass": true
+    },
+    "font_resolution_pct": {
+      "target": 99.9,
+      "current": 100.0,
+      "pass": true
+    },
+    "glyph_escalation_rate": {
+      "target": 0.1,
+      "current": 0.4264,
+      "pass": false
+    },
+    "mean_reconstruction_confidence": {
+      "target": 0.99,
+      "current": 0.984,
+      "pass": false
+    },
+    "mean_width_error_px": {
+      "target": 0.25,
+      "current": 0.461,
+      "pass": false
+    },
+    "validator_errors": {
+      "target": 0,
+      "current": 0,
+      "pass": true
+    }
+  },
+  "rendering": {
+    "glyph_escalation_rate": 0.4264,
+    "mean_reconstruction_confidence": 0.984,
+    "mean_width_error_px": 0.461
+  },
+  "overall_pass": false,
+  "fidelity": {
+    "families": {
+      "extraction": {
+        "family": "extraction",
+        "gate_pass": true,
+        "gates_overall": true,
+        "score": 1.0,
+        "metrics": [
+          {
+            "metric": "character_fidelity_pct",
+            "current": 100.0,
+            "target": 100.0,
+            "pass": true,
+            "confidence": 1.0,
+            "source": "conservation_ledger",
+            "unit": "%"
+          },
+          {
+            "metric": "unicode_fidelity_pct",
+            "current": 100.0,
+            "target": 100.0,
+            "pass": true,
+            "confidence": 1.0,
+            "source": "conservation_ledger",
+            "unit": "%"
+          },
+          {
+            "metric": "font_resolution_pct",
+            "current": 100.0,
+            "target": 99.9,
+            "pass": true,
+            "confidence": 1.0,
+            "source": "conservation_ledger",
+            "unit": "%"
+          },
+          {
+            "metric": "image_fidelity_pct",
+            "current": null,
+            "target": 99.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "%"
+          },
+          {
+            "metric": "shape_fidelity_pct",
+            "current": null,
+            "target": 99.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "%"
+          },
+          {
+            "metric": "metadata_fidelity_pct",
+            "current": null,
+            "target": 100.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "%"
+          }
+        ]
+      },
+      "typography": {
+        "family": "typography",
+        "gate_pass": false,
+        "gates_overall": true,
+        "score": 0.2927,
+        "metrics": [
+          {
+            "metric": "baseline_error_px",
+            "current": 0.001,
+            "target": 0.5,
+            "pass": true,
+            "confidence": 0.85,
+            "source": "static_geometry_model",
+            "unit": "px"
+          },
+          {
+            "metric": "line_height_deviation_px",
+            "current": 1.708,
+            "target": 0.5,
+            "pass": false,
+            "confidence": 0.95,
+            "source": "static_geometry",
+            "unit": "px"
+          },
+          {
+            "metric": "word_drift_px",
+            "current": 0.163,
+            "target": 0.25,
+            "pass": true,
+            "confidence": 0.8,
+            "source": "static_geometry",
+            "unit": "px"
+          },
+          {
+            "metric": "tracking_residual_px",
+            "current": 0.0,
+            "target": 0.5,
+            "pass": true,
+            "confidence": 0.9,
+            "source": "reconstruction_profile",
+            "unit": "px"
+          },
+          {
+            "metric": "kerning_error_px",
+            "current": null,
+            "target": 0.25,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "px"
+          },
+          {
+            "metric": "letter_spacing_error_px",
+            "current": null,
+            "target": 0.25,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "px"
+          }
+        ]
+      },
+      "layout": {
+        "family": "layout",
+        "gate_pass": true,
+        "gates_overall": true,
+        "score": 1.0,
+        "metrics": [
+          {
+            "metric": "paragraph_rhythm_px",
+            "current": 0.0,
+            "target": 1.0,
+            "pass": true,
+            "confidence": 0.9,
+            "source": "static_geometry",
+            "unit": "px"
+          },
+          {
+            "metric": "margin_error_px",
+            "current": null,
+            "target": 1.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "px"
+          },
+          {
+            "metric": "alignment_error_px",
+            "current": null,
+            "target": 1.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "px"
+          },
+          {
+            "metric": "column_accuracy_pct",
+            "current": null,
+            "target": 99.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "%"
+          }
+        ]
+      },
+      "semantic": {
+        "family": "semantic",
+        "gate_pass": null,
+        "gates_overall": false,
+        "score": null,
+        "metrics": [
+          {
+            "metric": "reading_order_accuracy_pct",
+            "current": null,
+            "target": 99.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "%"
+          },
+          {
+            "metric": "paragraph_accuracy_pct",
+            "current": null,
+            "target": 99.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "%"
+          },
+          {
+            "metric": "list_accuracy_pct",
+            "current": null,
+            "target": 99.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "%"
+          },
+          {
+            "metric": "table_accuracy_pct",
+            "current": null,
+            "target": 99.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "%"
+          },
+          {
+            "metric": "heading_accuracy_pct",
+            "current": null,
+            "target": 99.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "%"
+          }
+        ]
+      },
+      "rendering": {
+        "family": "rendering",
+        "gate_pass": false,
+        "gates_overall": true,
+        "score": 0.2345,
+        "metrics": [
+          {
+            "metric": "glyph_escalation_rate",
+            "current": 0.4264,
+            "target": 0.1,
+            "pass": false,
+            "confidence": 1.0,
+            "source": "reconstruction_profile",
+            "unit": ""
+          },
+          {
+            "metric": "mean_reconstruction_confidence",
+            "current": 0.984,
+            "target": 0.99,
+            "pass": false,
+            "confidence": 1.0,
+            "source": "reconstruction_profile",
+            "unit": ""
+          },
+          {
+            "metric": "browser_geometry_error_px",
+            "current": null,
+            "target": 0.25,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "px"
+          },
+          {
+            "metric": "pixel_fidelity_pct",
+            "current": null,
+            "target": 99.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "%"
+          }
+        ]
+      },
+      "performance": {
+        "family": "performance",
+        "gate_pass": null,
+        "gates_overall": false,
+        "score": null,
+        "metrics": [
+          {
+            "metric": "seconds_per_page",
+            "current": null,
+            "target": 5.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "s"
+          },
+          {
+            "metric": "peak_memory_mb_per_100_pages",
+            "current": null,
+            "target": 500.0,
+            "pass": null,
+            "confidence": 0.0,
+            "source": "reserved",
+            "unit": "MB"
+          }
+        ]
+      }
+    },
+    "overall": {
+      "pass": false,
+      "score": 0.2345,
+      "gating": "AND over critical families (extraction, typography, layout, rendering)"
+    }
+  }
+}

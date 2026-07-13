@@ -1,0 +1,51 @@
+{
+  "quality_passes": 0,
+  "total": 1,
+  "ok": 1,
+  "failed": 0,
+  "chars_total": 4828,
+  "chars_lost": 0,
+  "chars_substituted": 0,
+  "unicode_fidelity_pct": 100.0,
+  "unicode_parity_failures": 0,
+  "legacy_spans": 1039,
+  "semantic_spans": 195,
+  "span_reduction": 844,
+  "largest_page_spans": 20,
+  "low_confidence_paragraphs": 0,
+  "total_seconds": 356.604,
+  "total_issues": 3,
+  "issues_by_category": {
+    "Quality": 1,
+    "Rendering": 2
+  },
+  "issues_by_severity": {
+    "P1": 1,
+    "P2": 2
+  },
+  "certification": {
+    "certified": false,
+    "criteria": {
+      "no_p0_issues": {
+        "pass": true,
+        "detail": "0 P0 (release-blocking)"
+      },
+      "no_p1_issues": {
+        "pass": false,
+        "detail": "1 P1 (release-blocking)"
+      },
+      "no_pipeline_failures": {
+        "pass": true,
+        "detail": "0 failed"
+      },
+      "quality_all_pass": {
+        "pass": false,
+        "detail": "0/1 scorecards pass"
+      },
+      "semantic_parity": {
+        "pass": true,
+        "detail": "0 parity failures"
+      }
+    }
+  }
+}
