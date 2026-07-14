@@ -4,6 +4,7 @@ import logging
 import re
 import time
 import uuid
+from collections import Counter
 from pathlib import Path
 
 import fitz
@@ -243,7 +244,7 @@ def _sanitize_for_web(ext: str, content: bytes, family: str = "LayoutForge") -> 
         return None
 
 
-def _reconcile_cmap_from_usage(fonts_dir: Path, font: FontResource, usage: dict[int, int]) -> None:
+def _reconcile_cmap_from_usage(fonts_dir: Path, font: FontResource, usage: dict[int, Counter]) -> None:
     """Rewrites a font file's cmap so every (unicode → glyph id) pair the
     PDF ACTUALLY RENDERED (from page.get_texttrace()) maps correctly.
 
@@ -253,7 +254,16 @@ def _reconcile_cmap_from_usage(fonts_dir: Path, font: FontResource, usage: dict[
     own encoding on top. Browsers only have the file's cmap, so overlay
     text picks wrong or missing glyphs (garbled/doubled rendering). The
     texttrace is ground truth: the PDF renderer resolved each character to
-    a concrete glyph id, so we rebuild the cmap from exactly that."""
+    a concrete glyph id, so we rebuild the cmap from exactly that.
+
+    A codepoint can legitimately resolve to MORE THAN ONE glyph id across a
+    document — e.g. a deliberate InDesign stylistic-alternate substitution
+    on only some occurrences of a letter, to avoid visual repetition (Issue
+    005, 2026-07-14: found on a real book where 's' rendered via both its
+    standard glyph and a '.salt' alternate within one word). A cmap can
+    only hold one glyph per codepoint, so `usage[codepoint]` is a Counter
+    of every glyph id actually seen, and the MAJORITY glyph is kept — never
+    whichever occurrence happened to be processed last."""
     try:
         path = fonts_dir / font.filename
         tt = TTFont(io.BytesIO(path.read_bytes()))
@@ -264,9 +274,10 @@ def _reconcile_cmap_from_usage(fonts_dir: Path, font: FontResource, usage: dict[
             cmap = {}
 
         changed = False
-        for codepoint, glyph_id in usage.items():
+        for codepoint, glyph_counts in usage.items():
             if codepoint < 32 or codepoint == 0xFFFD:
                 continue
+            glyph_id, _count = glyph_counts.most_common(1)[0]
             if not 0 <= glyph_id < len(order):
                 continue
             glyph_name = order[glyph_id]
@@ -486,9 +497,17 @@ class ExtractFontsStage(Stage):
         fonts_dir = self._storage.fonts_dir(context.project_id)
         font_by_xref: dict[int, FontResource] = {}
         font_id_by_name: dict[str, str] = {}
-        # unicode → glyph id pairs the PDF actually rendered, per font xref
-        # (collected from texttrace; used to reconcile file cmaps below).
-        usage_by_xref: dict[int, dict[int, int]] = {}
+        # unicode -> Counter(glyph id -> occurrences) the PDF actually
+        # rendered, per font xref (collected from texttrace; used to
+        # reconcile file cmaps below). A codepoint can legitimately render
+        # through MORE THAN ONE glyph id across a document — e.g. a
+        # deliberate InDesign stylistic-alternate substitution used on only
+        # some occurrences of a letter to avoid visual repetition (Issue
+        # 005, 2026-07-14: 's' rendered via both its standard glyph and a
+        # '.salt' alternate in the same word). A cmap can only hold ONE
+        # glyph per codepoint, so every occurrence is counted and the
+        # MAJORITY glyph wins — never "whichever was processed last".
+        usage_by_xref: dict[int, dict[int, Counter]] = {}
 
         with fitz.open(context.source_pdf_path) as pdf:
             for index, pdf_page in enumerate(pdf, start=1):
@@ -570,7 +589,7 @@ class ExtractFontsStage(Stage):
                     for xref in names_to_xrefs.get(span.get("font", ""), []):
                         usage = usage_by_xref.setdefault(xref, {})
                         for char in span.get("chars", []):
-                            usage[char[0]] = char[1]
+                            usage.setdefault(char[0], Counter())[char[1]] += 1
 
                 logger.info(
                     "page=%s extract_fonts new_fonts=%s duration_ms=%.1f",
