@@ -44,6 +44,14 @@ class Settings(BaseSettings):
     use_rich_tree: bool = False
     emit_debug_attributes: bool = False
 
+    # Background raster text redaction (2026-07-13). OFF by default
+    # (2026-07-14): the HTML renderer/Instruction Builder is mid-validation
+    # and must be compared against the ORIGINAL full-text background so
+    # renderer changes and background-generation changes aren't validated
+    # together. Re-enable once the renderer is signed off — a separate,
+    # independently-tested milestone.
+    redact_background_text: bool = False
+
     @property
     def projects_dir(self) -> Path:
         return self.storage_root / "projects"

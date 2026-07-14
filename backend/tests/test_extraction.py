@@ -48,6 +48,29 @@ def test_render_backgrounds_writes_png_per_page(db_session, tmp_path: Path, rich
         assert (storage.project_dir(context.project_id) / page.background_image).exists()
 
 
+def test_render_backgrounds_redact_text_flag_strips_text_when_enabled(
+    db_session, tmp_path: Path, rich_pdf_path: Path
+) -> None:
+    """`redact_text` defaults OFF (2026-07-14, pending renderer sign-off —
+    see RenderBackgroundsStage docstring) but must still work when a caller
+    opts in: the two fixture pages differ ONLY by heading text, so with
+    text stripped their backgrounds become pixel-identical and dedup to 1
+    background + 1 embedded image = 2 total (vs 3 with redaction off)."""
+    context, storage, page_repo, project_repo = make_context_with_metadata(db_session, tmp_path, rich_pdf_path)
+    asset_repo = SQLiteAssetRepository(db_session)
+
+    RenderBackgroundsStage(storage, dpi=72, redact_text=True).run(context)
+    ExtractFontsStage(storage).run(context)
+    ExtractImagesStage(storage).run(context)
+    ExtractTextStage().run(context)
+    NormalizeIdmStage().run(context)
+    PersistAssetsStage(asset_repo, page_repo, storage).run(context)
+
+    assets = asset_repo.list_by_project(context.project_id)
+    image_assets = [a for a in assets if a.type.value == "image"]
+    assert len(image_assets) == 2
+
+
 def test_extract_fonts_finds_used_fonts(db_session, tmp_path: Path, rich_pdf_path: Path) -> None:
     context, storage, *_ = make_context_with_metadata(db_session, tmp_path, rich_pdf_path)
 
@@ -157,11 +180,11 @@ def test_persist_assets_deduplicates_against_existing_db_row(db_session, tmp_pat
 
     assets = asset_repo.list_by_project(context.project_id)
     image_assets = [a for a in assets if a.type.value == "image"]
-    # Backgrounds are now text-redacted (2026-07-13) — the fixture's two
-    # pages differ ONLY by their heading text ("Page 1/2 heading"), so with
-    # text stripped the two backgrounds are pixel-identical and legitimately
-    # dedup to 1, plus the 1 deduplicated embedded image = 2 total.
-    assert len(image_assets) == 2
+    # 2 page backgrounds + 1 deduplicated embedded image. Background text
+    # redaction (render_backgrounds.py) exists but defaults OFF (2026-07-14)
+    # pending renderer sign-off — see test_render_backgrounds.py for the
+    # redact_text=True behavior.
+    assert len(image_assets) == 3
 
     shared_image = next(a for a in image_assets if a.original_object_id is not None)
     assert sorted(asset_repo.list_pages_for_asset(shared_image.id)) == [1, 2]

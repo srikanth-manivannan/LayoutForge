@@ -20,7 +20,7 @@ class RenderBackgroundsStage(Stage):
     page — only the lightweight IDM metadata (path, dimensions, hash)
     is retained, so memory use doesn't grow with page count.
 
-    Text is redacted from the raster BEFORE rendering (2026-07-13): the
+    Text CAN be redacted from the raster before rendering (2026-07-13): the
     background is a proofing backdrop for art/photos/illustrations, never a
     second copy of the page's text — the Rich-IDM-driven HTML overlay is the
     only text layer. Without this, the raster's own baked-in PDF text and
@@ -35,11 +35,19 @@ class RenderBackgroundsStage(Stage):
     default strike-through marks. This mutates only this stage's own
     in-memory `fitz.Document` (opened fresh from the source PDF and never
     saved back to disk) — extraction stages open their own independent
-    instance and are unaffected."""
+    instance and are unaffected.
 
-    def __init__(self, storage_service: StorageService, dpi: int) -> None:
+    `redact_text` defaults OFF (2026-07-14): the renderer/Instruction
+    Builder is mid-validation and must be verified against the ORIGINAL
+    full-text background — changing the background asset at the same time
+    as renderer fixes conflates two independent variables. The redaction
+    code stays in place, gated, for re-enabling once the renderer is signed
+    off (a separate milestone)."""
+
+    def __init__(self, storage_service: StorageService, dpi: int, redact_text: bool = False) -> None:
         self._storage = storage_service
         self._dpi = dpi
+        self._redact_text = redact_text
 
     @property
     def name(self) -> str:
@@ -55,15 +63,16 @@ class RenderBackgroundsStage(Stage):
             for index, pdf_page in enumerate(pdf, start=1):
                 started = time.perf_counter()
                 try:
-                    for word in pdf_page.get_text("words"):
-                        x0, y0, x1, y1 = word[:4]
-                        pdf_page.add_redact_annot(fitz.Rect(x0, y0, x1, y1), fill=None, cross_out=False)
-                    if pdf_page.first_annot is not None:
-                        pdf_page.apply_redactions(
-                            images=fitz.PDF_REDACT_IMAGE_NONE,
-                            graphics=fitz.PDF_REDACT_LINE_ART_NONE,
-                            text=fitz.PDF_REDACT_TEXT_REMOVE,
-                        )
+                    if self._redact_text:
+                        for word in pdf_page.get_text("words"):
+                            x0, y0, x1, y1 = word[:4]
+                            pdf_page.add_redact_annot(fitz.Rect(x0, y0, x1, y1), fill=None, cross_out=False)
+                        if pdf_page.first_annot is not None:
+                            pdf_page.apply_redactions(
+                                images=fitz.PDF_REDACT_IMAGE_NONE,
+                                graphics=fitz.PDF_REDACT_LINE_ART_NONE,
+                                text=fitz.PDF_REDACT_TEXT_REMOVE,
+                            )
                     pixmap = pdf_page.get_pixmap(matrix=matrix)
                     image_bytes = pixmap.tobytes("png")
                     width, height = pixmap.width, pixmap.height

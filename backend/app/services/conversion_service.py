@@ -55,7 +55,10 @@ class ConversionService:
         return [
             ValidateStage(),
             MetadataStage(self._pages, self._projects),
-            RenderBackgroundsStage(self._storage, dpi=self._settings.preview_dpi),
+            RenderBackgroundsStage(
+                self._storage, dpi=self._settings.preview_dpi,
+                redact_text=self._settings.redact_background_text,
+            ),
             ExtractFontsStage(self._storage),
             ExtractImagesStage(self._storage),
             ExtractTextStage(),
