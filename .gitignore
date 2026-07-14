@@ -5,3 +5,4 @@ storage/
 .venv/
 .pytest_cache/
 dist/
+backend/tools/
