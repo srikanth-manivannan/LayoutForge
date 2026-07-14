@@ -183,8 +183,29 @@ def _make_paragraph(lines: list[Line], merges: list[tuple[float, list[Vote]]], c
         signals = []
         reason = "single_line"
 
-    leadings = sorted(line.leading for line in lines if line.leading > 0)
-    line_height = leadings[len(leadings) // 2] if leadings else 0.0
+    # line_height drives the browser's CSS line-height for the whole flowed
+    # paragraph, so it must be the REAL measured baseline-to-baseline gap
+    # whenever one exists — not a per-line font-metric estimate (ascender -
+    # descender) * font_size, which approximates a single isolated line's
+    # natural height but is not the PDF's actual inter-line spacing. A
+    # multi-line paragraph already carries real spacing in its own lines'
+    # baseline_y values; using anything else here silently inflates the
+    # paragraph's flowed height, which then pushes every paragraph after it
+    # further down the page — the same class of defect as inventing/
+    # discarding measured geometry in the Instruction Builder (2026-07-14).
+    baseline_gaps = sorted(
+        curr.baseline_y - prev.baseline_y
+        for prev, curr in zip(lines, lines[1:])
+        if curr.baseline_y > prev.baseline_y
+    )
+    if baseline_gaps:
+        line_height = round(baseline_gaps[len(baseline_gaps) // 2], 2)
+    else:
+        # Single-line paragraph (or no valid consecutive baselines): no real
+        # gap to measure, fall back to the font-metric estimate each line
+        # already carries (Line.leading, from geometry_normalizer.py).
+        leadings = sorted(line.leading for line in lines if line.leading > 0)
+        line_height = leadings[len(leadings) // 2] if leadings else 0.0
     return Paragraph(
         id=str(uuid.uuid4()),
         bbox=bbox,

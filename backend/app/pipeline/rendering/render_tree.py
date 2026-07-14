@@ -20,6 +20,19 @@ Phase R-2's line-flattening (paragraph → merged runs, browser wraps within
 the paragraph) is unchanged and combines with this: paragraphs now flow
 correctly relative to EACH OTHER, and text flows correctly WITHIN each one.
 
+Rule 4 extended (2026-07-13): **the Instruction Builder must not destroy
+measured geometry, only decline to invent it.** `margin-top` is the PDF-
+measured gap between consecutive paragraphs' bounding boxes, emitted
+EXACTLY as measured — including negative values. A negative gap is not
+measurement noise; it means the two paragraphs' PDF boxes genuinely
+overlap (found on a real cover: a title's tall glyph bbox overlapping the
+tagline beneath it by 31pt — ordinary for large/hand-drawn display type).
+Clamping that to zero was itself a repair — discarding a real measurement
+because the model didn't expect it, the same failure mode Rule 0 exists to
+prevent. CSS `margin-top` supports negative values natively; the browser
+pulls the next paragraph up to reproduce the overlap. No classification, no
+threshold: every gap, whatever its sign, is represented as-is.
+
 Rotated paragraphs (margin text) are the one deliberate exception: rotation
 requires an absolute anchor, so they stay ABSOLUTE within their region and
 do not participate in the flow chain (they neither push nor are pushed by
@@ -162,9 +175,27 @@ def _flatten_paragraph_runs(paragraph, base, fonts_by_id) -> list[tuple[str, dic
 
 
 def _build_paragraph_node(paragraph, region, fonts_by_id, block_by_line) -> "tuple[RenderNode, float, float]":
-    """Returns (node, bbox_top, bbox_bottom) — the bbox extent is still
-    reported (for margin computation against the NEXT paragraph and for
-    diagnostics) but is never asserted as a CSS height."""
+    """Returns (node, bbox_top, chain_bottom) — bbox_top anchors THIS
+    paragraph's own margin-top; chain_bottom is what the NEXT paragraph's
+    margin-top is measured from, and is never asserted as a CSS height.
+
+    chain_bottom uses `line_count * line_height`, NOT the PDF's ink-tight
+    `bbox.height` (2026-07-14). Those two numbers measure different things:
+    ink-tight bbox spans first-line-ascent to last-line-descent, while the
+    browser renders `line_count` uniform boxes of `line_height` — for
+    generously-leaded text (line_height greater than the font's own
+    ascent+descent) they diverge by that exact difference, and using the
+    ink bbox as the anchor made every multi-line paragraph's actual
+    rendered height fall short of what the anchor assumed, pulling every
+    following paragraph up (found via real book: 5.46px/paragraph,
+    compounding to -20.9px after 4 multi-line paragraphs). `line_count *
+    line_height` is what the browser will actually render for a paragraph
+    whose wrap matches the PDF's own line count — the common case — so the
+    chain stays self-consistent. It is still an approximation when the
+    browser wraps to a different line count than the PDF (a separate,
+    smaller, already-acknowledged limit of browser-owned reflow — not
+    solved here, and not solvable without the engine duplicating the
+    browser's own text-measurement)."""
     runs = [run for line in paragraph.lines for run in line.runs]
     base = max(runs, key=lambda r: len(r.text))
 
@@ -210,7 +241,14 @@ def _build_paragraph_node(paragraph, region, fonts_by_id, block_by_line) -> "tup
     for text, run_style, rise, run_id in _flatten_paragraph_runs(paragraph, base, fonts_by_id):
         node.children.append(RenderNode(kind="run", object_id=run_id, mode=NORMAL,
                                         text=text, style=run_style, rise=rise))
-    return node, paragraph.bbox.y, paragraph.bbox.y + paragraph.bbox.height
+    if paragraph.line_height:
+        chain_bottom = paragraph.bbox.y + len(paragraph.lines) * paragraph.line_height
+    else:
+        # No measured or estimated line_height at all (degenerate case, e.g.
+        # a paragraph with no positive leading anywhere) — the ink bbox is
+        # the only geometry left to chain from.
+        chain_bottom = paragraph.bbox.y + paragraph.bbox.height
+    return node, paragraph.bbox.y, chain_bottom
 
 
 def build_render_tree(document: Document, page: Page) -> RenderNode:
@@ -245,8 +283,23 @@ def build_render_tree(document: Document, page: Page) -> RenderNode:
                 # a margin — never an absolute position. First paragraph in
                 # the region anchors to the region's own top (already at
                 # paragraph[0].bbox.y by construction — see region_builder).
+                #
+                # The gap is emitted EXACTLY as measured, including negative
+                # values (2026-07-13): a negative gap means the two
+                # paragraphs' PDF bounding boxes genuinely overlap — common
+                # for large/hand-drawn display type (e.g. a cover's title
+                # and tagline), never noise to be discarded. The Instruction
+                # Builder must not invent or destroy geometry (Rule 4
+                # extended to this layer): clamping to 0 would silently
+                # throw away a real measurement, exactly the class of
+                # "renderer repairs the model" behavior this architecture
+                # forbids. CSS `margin-top` natively supports negative
+                # values — the browser pulls the paragraph up into the
+                # previous one's box, reproducing the PDF's own overlap
+                # deterministically. No threshold, no classification: every
+                # gap, positive or negative, is represented as-is.
                 anchor = previous_bottom if previous_bottom is not None else region.bbox.y
-                gap = max(0.0, top - anchor)  # never negative — safe degrade
+                gap = top - anchor
                 node.geometry["margin-top"] = f"{gap:g}px"
                 left_offset = max(0.0, paragraph.bbox.x - region.bbox.x)
                 if left_offset:

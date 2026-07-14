@@ -53,6 +53,30 @@ def test_font_size_jump_breaks_paragraph() -> None:
     assert paras[0].lines[0].runs[0].text == "A Heading"
 
 
+def test_line_height_uses_measured_baseline_gap_not_font_metric_estimate() -> None:
+    """Reproduces the real-book finding (2026-07-14): a font's per-line
+    ascender/descender ESTIMATE (Line.leading) can overstate the PDF's true
+    inter-line spacing. When real consecutive baselines are available,
+    Paragraph.line_height must reflect the MEASURED 14.4px gap, not the
+    19.86px estimate every line individually carries — using the estimate
+    silently inflates the paragraph's flowed height in the browser and
+    pushes every following paragraph down the page."""
+    lines = [_line(100.0, leading=19.86), _line(114.4, leading=19.86), _line(128.8, leading=19.86)]
+    paras = build_paragraphs(lines)
+    assert len(paras) == 1
+    assert paras[0].line_height == 14.4  # measured, not the 19.86 estimate
+
+
+def test_single_line_paragraph_falls_back_to_font_metric_estimate() -> None:
+    """No real inter-line gap exists to measure for a lone line — the
+    font-metric estimate is the only geometry available, and using it is
+    not "inventing" data (Rule 4 concerns a later stage overriding an
+    EARLIER stage's real measurement; here there is none to override)."""
+    paras = build_paragraphs([_line(100.0, leading=19.86)])
+    assert len(paras) == 1
+    assert paras[0].line_height == 19.86
+
+
 def test_hyphenation_holds_a_paragraph_together() -> None:
     # A slightly-too-large gap that would otherwise be borderline, rescued by
     # a trailing hyphen signalling the word continues on the next line.

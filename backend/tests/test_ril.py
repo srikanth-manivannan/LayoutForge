@@ -79,6 +79,40 @@ def _two_paragraph_document(gap: float = 6.0) -> tuple[Document, Page]:
     return Document(project_id="p", pages=[page], fonts=fonts), page
 
 
+def _multiline_then_single_document() -> tuple[Document, Page]:
+    """Reproduces the real-book finding (2026-07-14): a 2-line paragraph
+    whose ink-tight bbox.height (16px) differs from what the browser will
+    actually render (2 lines * 10px line_height = 20px) — generously-leaded
+    text, where line_height exceeds the font's own ascent+descent. The
+    SECOND paragraph's true PDF top is 30; the chain anchor must be based
+    on line_count*line_height (20), not bbox.height (16), for the resulting
+    margin to place paragraph 2 where the browser will actually put it."""
+    fonts = [FontResource(id="f1", original_name="Arial", family="Arial")]
+    bb1 = BoundingBox(50, 0, 300, 16)  # ink-tight bbox height 16 != 2*10
+    line1 = Line(id="l1", bbox=BoundingBox(50, 0, 300, 8), baseline_y=8.0,
+                 runs=[Run(id="r1", bbox=BoundingBox(50, 0, 300, 8), text="First line", font_id="f1", font_size=8.0)])
+    line2 = Line(id="l2", bbox=BoundingBox(50, 8, 300, 8), baseline_y=18.0,
+                 runs=[Run(id="r2", bbox=BoundingBox(50, 8, 300, 8), text="Second line", font_id="f1", font_size=8.0)])
+    para1 = Paragraph(id="p1", bbox=bb1, line_height=10.0, lines=[line1, line2])
+
+    bb2 = BoundingBox(50, 30, 300, 14)
+    line3 = Line(id="l3", bbox=bb2, baseline_y=40.0,
+                 runs=[Run(id="r3", bbox=bb2, text="Next paragraph", font_id="f1", font_size=12.0)])
+    para2 = Paragraph(id="p2", bbox=bb2, line_height=14.0, lines=[line3])
+
+    blocks = [
+        TextBlock(id="b1", page=1, bbox=BoundingBox(50, 0, 300, 8), text="First line", origin_y=8.0,
+                  font_size=8.0, ascender=0.8, descender=-0.2),
+        TextBlock(id="b2", page=1, bbox=BoundingBox(50, 8, 300, 8), text="Second line", origin_y=18.0,
+                  font_size=8.0, ascender=0.8, descender=-0.2),
+        TextBlock(id="b3", page=1, bbox=bb2, text="Next paragraph", origin_y=40.0,
+                  font_size=12.0, ascender=0.8, descender=-0.2),
+    ]
+    region = Region(id="reg1", bbox=BoundingBox(50, 0, 300, 44), paragraphs=[para1, para2])
+    page = Page(number=1, width=600, height=800, text_blocks=blocks, regions=[region])
+    return Document(project_id="p", pages=[page], fonts=fonts), page
+
+
 # ---- Rule 1: compiler purity ------------------------------------------------
 
 def test_compiler_imports_no_idm_nodes() -> None:
@@ -180,13 +214,41 @@ def test_margin_top_equals_the_pdf_measured_gap() -> None:
     assert paragraphs[1].geometry["margin-top"] == "6px"
 
 
-def test_margin_top_never_goes_negative() -> None:
-    # A near-zero/negative measured gap (noisy geometry) must clamp to 0,
-    # never produce a negative margin that recreates overlap.
+def test_negative_gap_is_preserved_not_clamped() -> None:
+    """2026-07-13 policy: a negative measured gap means the two paragraphs'
+    PDF bounding boxes genuinely overlap (found on a real book cover — a
+    title's tall glyph bbox overlapping its tagline by 31pt). That is real
+    geometry, not noise — clamping it to 0 would be the Instruction Builder
+    repairing/destroying a measurement, which Rule 4 forbids. CSS
+    `margin-top` natively supports negative values, so the exact measured
+    gap is emitted as-is, whatever its sign."""
     document, page = _two_paragraph_document(gap=-2.0)
     tree = build_render_tree(document, page)
     paragraphs = tree.children[0].children
-    assert paragraphs[1].geometry["margin-top"] == "0px"
+    assert paragraphs[1].geometry["margin-top"] == "-2px"
+
+
+def test_large_overlap_matches_the_real_cover_page_case() -> None:
+    """Reproduces the exact real-book finding: a title paragraph (tall
+    hand-drawn display font) whose bbox bottom sits BELOW the next
+    paragraph's bbox top by 31.36pt — genuine PDF overlap, not noise."""
+    document, page = _two_paragraph_document(gap=-31.36)
+    tree = build_render_tree(document, page)
+    paragraphs = tree.children[0].children
+    assert paragraphs[1].geometry["margin-top"] == "-31.36px"
+
+
+def test_chain_anchor_uses_rendered_height_not_ink_bbox() -> None:
+    """2026-07-14: the chain anchor for the NEXT paragraph's margin-top must
+    be `line_count * line_height` (what the browser actually renders), not
+    the PDF's ink-tight bbox.height — they diverge whenever line_height
+    exceeds the font's own ascent+descent (generously-leaded text). Here
+    paragraph 1 has bbox.height=16 but renders as 2*10=20; paragraph 2's
+    true PDF top is 30, so the correct margin is 30-20=10, not 30-16=14."""
+    document, page = _multiline_then_single_document()
+    tree = build_render_tree(document, page)
+    paragraphs = tree.children[0].children
+    assert paragraphs[1].geometry["margin-top"] == "10px"
 
 
 def test_taller_render_pushes_next_paragraph_not_overlaps() -> None:
