@@ -6,3 +6,4 @@ storage/
 .pytest_cache/
 dist/
 backend/tools/
+golden-corpus/9798225071486_10_07.pdf
