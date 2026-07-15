@@ -37,7 +37,7 @@ def test_css_output_writes_common_and_per_page_files(db_session, tmp_path: Path,
     assert ".lf-page {" in common_css
     # RIL DOM base rules replace the legacy .lf-text-block.
     assert ".lf-paragraph {" in common_css
-    assert ".lf-line" not in common_css  # R-2: lines are engine-only
+    assert ".lf-line {" in common_css  # Line Layout Engine (2026-07-15): lines are their own DOM element
     assert ".lf-text-block" not in common_css
 
     # Text geometry/styles moved to the Render Tree (inline geometry +
@@ -103,6 +103,23 @@ def test_css_output_emits_font_face_for_embedded_fonts() -> None:
     assert css.count("@font-face") == 1
 
 
+def test_paragraph_white_space_never_lets_the_browser_add_its_own_wrap() -> None:
+    """2026-07-14: `.lf-paragraph` must be `white-space: pre`, not
+    `pre-wrap`. Every real line break is now an explicit `\\n` placed at the
+    PDF's own line boundary (render_tree.py); `pre-wrap` additionally let
+    the browser introduce an UNINTENDED extra wrap whenever a line's actual
+    glyph advances came out even slightly wider than its PDF-measured box
+    (found on a real book: a single-line cover title wrapped into two lines
+    from a ~2px font-hinting difference). `pre` preserves the same spacing/
+    breaks but can never add a wrap point of its own."""
+    from app.pipeline.document import Document
+    from app.pipeline.outputs.css_output import _build_common_css
+
+    css = _build_common_css(Document(project_id="p1"))
+    assert "white-space: pre;" in css
+    assert "pre-wrap" not in css
+
+
 def test_no_typography_registry_classes_land_in_common_css(db_session, tmp_path: Path) -> None:
     """Rendering Stabilization phase (temporary, 2026-07-13): the Style
     Registry is bypassed — common.css carries only structural rules
@@ -137,10 +154,15 @@ def test_rotated_line_gets_rotation_transform(db_session, tmp_path: Path) -> Non
     rotated_block = next((b for b in page_one.text_blocks if b.rotation), None)
     if rotated_block is not None:
         # Rotation now lives on the Render Tree's line geometry (decided in
-        # the Instruction Builder, emitted inline by the compiler).
-        tree = context.scratch["ril_trees"][1]
+        # the Instruction Builder, emitted inline by the compiler) — every
+        # line is absolute now, rotated or not, so this is just an
+        # alternate geometry dict on the same node (2026-07-15b).
+        tree = context.scratch["ril_trees"][1]  # page -> region -> paragraph -> line
         rotated = [
-            line for para in tree.children for line in para.children
+            line
+            for region in tree.children
+            for para in region.children
+            for line in para.children
             if "transform" in line.geometry
         ]
         assert rotated, "rotated line must carry a rotate() transform in its geometry"

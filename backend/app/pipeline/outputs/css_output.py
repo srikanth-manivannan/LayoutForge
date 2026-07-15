@@ -42,19 +42,34 @@ def _build_common_css(document: Document) -> str:
         "html, body { margin: 0; padding: 0; }",
         ".lf-page { position: relative; overflow: hidden; background-color: #ffffff; }",
         ".lf-page-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }",
-        # RIL Rule 0 DOM: exactly ONE absolute anchor per region; paragraphs
-        # inside are NORMAL-FLOW blocks (not position:absolute) so the
-        # browser stacks them — a paragraph that renders taller than its PDF
-        # measurement pushes the next one down instead of overlapping it.
-        # Margin-top (PDF-measured inter-paragraph gap) provides spacing;
-        # height is never asserted. THE BROWSER WRAPS THE LINES (lines are
-        # engine concepts and never reach HTML). `pre-wrap` preserves the
-        # PDF's exact spaces (incl. hair/thin spaces) while allowing
-        # wrapping; kerning/ligatures disabled so the browser's advance
-        # model matches the measurement engine's.
+        # Line-as-absolute-primitive (2026-07-15b): exactly ONE absolute
+        # anchor per region (`.lf-region`); `.lf-paragraph` stays
+        # position:static deliberately — that's what lets its `.lf-line`
+        # children's `position:absolute` `left`/`top` resolve against the
+        # REGION (the nearest positioned ancestor), not against the
+        # paragraph. A paragraph is a purely semantic container: it never
+        # flows or positions text, only carries typography defaults its
+        # lines/runs inherit.
+        #
+        # This replaced a flow-chain model where paragraphs/lines were
+        # positioned by margin-top computed from a PDF-measured gap plus a
+        # predicted sibling height — found, on a real book, to compound: a
+        # paragraph whose line mixed two font sizes rendered taller than
+        # its predicted height, and every paragraph after it inherited that
+        # error, reaching +16.6px by the third paragraph on a cover page.
+        # Absolute per-line positioning (`top`/`left` computed directly
+        # from each line's own PDF `baseline_y`/`bbox.x` — see
+        # render_tree.py's `_build_line_nodes`/`_line_offset`) makes that
+        # structurally impossible: no line's position depends on any other
+        # line's or paragraph's rendered size, so an error on one line
+        # cannot propagate to another.
+        # `white-space: pre` stays on `.lf-line` — forced no-browser-
+        # wrapping is correct and unrelated to this change. Kerning/
+        # ligatures disabled so the browser's advance model matches the
+        # measurement engine's.
         ".lf-region { position: absolute; }",
-        ".lf-paragraph { margin: 0; white-space: pre-wrap; "
-        "font-kerning: none; font-variant-ligatures: none; }",
+        ".lf-paragraph { position: static; margin: 0; font-kerning: none; font-variant-ligatures: none; }",
+        ".lf-line { position: absolute; white-space: pre; }",
         ".lf-image { position: absolute; transform-origin: top left; }",
         "",
     ]

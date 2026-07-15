@@ -1,10 +1,14 @@
 """Render Instruction Layer (permanent rendering architecture, approved
-2026-07-12; Rule 0 added 2026-07-13). Rules under test: compiler purity
-(Rule 1), determinism (Rule 2), paragraph DOM with no line elements (Rule 3),
-compiler-never-repairs via validator gating (Rules 4+6), Style Registry
-classes (Rule 7), and Rule 0 — one dimension, one owner: flowed paragraphs
-carry no top/height; regions are the one absolute anchor; inter-paragraph
-spacing is a PDF-measured-gap margin, never an absolute coordinate."""
+2026-07-12; Rule 0 added 2026-07-13; Line Layout Engine 2026-07-15;
+line-as-absolute-primitive 2026-07-15b). Rules under test: compiler purity
+(Rule 1), determinism (Rule 2), paragraph DOM as a semantic wrapper around
+per-PDF-line `<span class="lf-line">` children (Rule 3), compiler-never-
+repairs via validator gating (Rules 4+6), Style Registry classes (Rule 7),
+and Rule 0 — one dimension, one owner: a region is the one absolute anchor
+per region; every line is ALSO absolute within it, positioned directly from
+its own PDF-measured `baseline_y`/`bbox.x` (never a predicted sibling or
+paragraph size — see render_tree.py's `_line_offset`); a paragraph is a
+purely semantic, position:static wrapper that asserts no geometry at all."""
 
 import ast
 from pathlib import Path
@@ -40,8 +44,8 @@ def _document() -> tuple[Document, Page]:
     runs2 = [Run(id="r4", bbox=bb2, text="second line here", font_id="f1", font_size=12.0,
                  color="#000000", rise=3.5)]
     lines = [
-        Line(id="l1", bbox=bb1, baseline_y=110.0, runs=runs1),
-        Line(id="l2", bbox=bb2, baseline_y=124.0, runs=runs2),
+        Line(id="l1", bbox=bb1, baseline_y=110.0, ascent=10.0, leading=14.0, runs=runs1),
+        Line(id="l2", bbox=bb2, baseline_y=124.0, ascent=10.0, leading=14.0, runs=runs2),
     ]
     paragraph = Paragraph(id="p1", bbox=BoundingBox(50, 100, 300, 28), line_height=14.0, lines=lines)
     blocks = [
@@ -55,60 +59,74 @@ def _document() -> tuple[Document, Page]:
     return Document(project_id="p", pages=[page], fonts=fonts), page
 
 
-def _two_paragraph_document(gap: float = 6.0) -> tuple[Document, Page]:
-    """Two single-line paragraphs in one region, separated vertically by
-    `gap` px — the exact shape of the copyright-page overlap bug."""
+def _two_paragraph_document() -> tuple[Document, Page]:
+    """Two single-line paragraphs in one region, with overlapping PDF boxes
+    (the exact shape of the real cover-page case) — demonstrates that each
+    line's position depends ONLY on its own baseline_y/ascent/leading, never
+    on the other paragraph's rendered size."""
     fonts = [FontResource(id="f1", original_name="Arial", family="Arial")]
     bb1 = BoundingBox(50, 100, 300, 14)
-    y2 = 100 + 14 + gap
-    bb2 = BoundingBox(50, y2, 300, 14)
-    line1 = Line(id="l1", bbox=bb1, baseline_y=110.0,
+    line1 = Line(id="l1", bbox=bb1, baseline_y=110.0, ascent=10.0, leading=14.0,
                  runs=[Run(id="r1", bbox=bb1, text="First paragraph", font_id="f1", font_size=12.0)])
-    line2 = Line(id="l2", bbox=bb2, baseline_y=y2 + 10.0,
-                 runs=[Run(id="r2", bbox=bb2, text="Second paragraph", font_id="f1", font_size=12.0)])
     para1 = Paragraph(id="p1", bbox=bb1, line_height=14.0, lines=[line1])
+
+    bb2 = BoundingBox(50, 105, 300, 14)  # genuinely overlaps para1's box
+    line2 = Line(id="l2", bbox=bb2, baseline_y=118.0, ascent=10.0, leading=14.0,
+                 runs=[Run(id="r2", bbox=bb2, text="Second paragraph", font_id="f1", font_size=12.0)])
     para2 = Paragraph(id="p2", bbox=bb2, line_height=14.0, lines=[line2])
+
     blocks = [
         TextBlock(id="b1", page=1, bbox=bb1, text="First paragraph", origin_y=110.0,
                   font_size=12.0, ascender=0.8, descender=-0.2),
-        TextBlock(id="b2", page=1, bbox=bb2, text="Second paragraph", origin_y=y2 + 10.0,
+        TextBlock(id="b2", page=1, bbox=bb2, text="Second paragraph", origin_y=118.0,
                   font_size=12.0, ascender=0.8, descender=-0.2),
     ]
-    region = Region(id="reg1", bbox=BoundingBox(50, 100, 300, y2 + 14 - 100), paragraphs=[para1, para2])
+    region = Region(id="reg1", bbox=BoundingBox(50, 100, 300, 19), paragraphs=[para1, para2])
     page = Page(number=1, width=600, height=800, text_blocks=blocks, regions=[region])
     return Document(project_id="p", pages=[page], fonts=fonts), page
 
 
-def _multiline_then_single_document() -> tuple[Document, Page]:
-    """Reproduces the real-book finding (2026-07-14): a 2-line paragraph
-    whose ink-tight bbox.height (16px) differs from what the browser will
-    actually render (2 lines * 10px line_height = 20px) — generously-leaded
-    text, where line_height exceeds the font's own ascent+descent. The
-    SECOND paragraph's true PDF top is 30; the chain anchor must be based
-    on line_count*line_height (20), not bbox.height (16), for the resulting
-    margin to place paragraph 2 where the browser will actually put it."""
+def _three_line_paragraph_document() -> tuple[Document, Page]:
+    """One paragraph, three PDF lines, non-uniform baseline gaps (16px then
+    12px) — each line's own `top` is derived directly from its own
+    `baseline_y`, independent of the others (no chain, no margin math)."""
     fonts = [FontResource(id="f1", original_name="Arial", family="Arial")]
-    bb1 = BoundingBox(50, 0, 300, 16)  # ink-tight bbox height 16 != 2*10
-    line1 = Line(id="l1", bbox=BoundingBox(50, 0, 300, 8), baseline_y=8.0,
-                 runs=[Run(id="r1", bbox=BoundingBox(50, 0, 300, 8), text="First line", font_id="f1", font_size=8.0)])
-    line2 = Line(id="l2", bbox=BoundingBox(50, 8, 300, 8), baseline_y=18.0,
-                 runs=[Run(id="r2", bbox=BoundingBox(50, 8, 300, 8), text="Second line", font_id="f1", font_size=8.0)])
-    para1 = Paragraph(id="p1", bbox=bb1, line_height=10.0, lines=[line1, line2])
-
-    bb2 = BoundingBox(50, 30, 300, 14)
-    line3 = Line(id="l3", bbox=bb2, baseline_y=40.0,
-                 runs=[Run(id="r3", bbox=bb2, text="Next paragraph", font_id="f1", font_size=12.0)])
-    para2 = Paragraph(id="p2", bbox=bb2, line_height=14.0, lines=[line3])
-
+    baselines = [100.0, 116.0, 128.0]  # gaps: 16, 12
+    lines = []
+    for i, baseline_y in enumerate(baselines):
+        bb = BoundingBox(50, baseline_y - 10, 300, 14)
+        lines.append(Line(id=f"l{i}", bbox=bb, baseline_y=baseline_y, ascent=10.0, leading=14.0,
+                           runs=[Run(id=f"r{i}", bbox=bb, text=f"Line {i}", font_id="f1", font_size=12.0)]))
+    bbox = BoundingBox(50, baselines[0] - 10, 300, (baselines[-1] - 10) - (baselines[0] - 10) + 14)
+    paragraph = Paragraph(id="p1", bbox=bbox, line_height=14.0, lines=lines)
     blocks = [
-        TextBlock(id="b1", page=1, bbox=BoundingBox(50, 0, 300, 8), text="First line", origin_y=8.0,
-                  font_size=8.0, ascender=0.8, descender=-0.2),
-        TextBlock(id="b2", page=1, bbox=BoundingBox(50, 8, 300, 8), text="Second line", origin_y=18.0,
-                  font_size=8.0, ascender=0.8, descender=-0.2),
-        TextBlock(id="b3", page=1, bbox=bb2, text="Next paragraph", origin_y=40.0,
-                  font_size=12.0, ascender=0.8, descender=-0.2),
+        TextBlock(id=f"b{i}", page=1, bbox=lines[i].bbox, text=f"Line {i}",
+                  origin_y=baselines[i], font_size=12.0)
+        for i in range(3)
     ]
-    region = Region(id="reg1", bbox=BoundingBox(50, 0, 300, 44), paragraphs=[para1, para2])
+    region = Region(id="reg1", bbox=bbox, paragraphs=[paragraph])
+    page = Page(number=1, width=600, height=800, text_blocks=blocks, regions=[region])
+    return Document(project_id="p", pages=[page], fonts=fonts), page
+
+
+def _mixed_font_size_line_document() -> tuple[Document, Page]:
+    """One line, two runs at different font sizes — the proximate cause of
+    the compounding bug this architecture replaces (a mixed-size line used
+    to inflate its shared paragraph box, pushing every later paragraph down
+    the chain). The line's own `top` must come from whichever run's local
+    offset is larger, not just the primary (longest-text) run's — and,
+    since nothing chains off it anymore, this stays local to this one line."""
+    fonts = [
+        FontResource(id="f1", original_name="Arial", family="Arial"),
+        FontResource(id="f2", original_name="Arial-Bold", family="Arial-Bold", weight="bold"),
+    ]
+    bbox = BoundingBox(50, 90, 300, 30)
+    base_run = Run(id="r1", bbox=bbox, text="Normal text", font_id="f1", font_size=20.0)
+    big_run = Run(id="r2", bbox=bbox, text="BIG", font_id="f2", font_size=30.0, weight="bold")
+    line = Line(id="l1", bbox=bbox, baseline_y=110.0, ascent=16.0, leading=24.0, runs=[base_run, big_run])
+    paragraph = Paragraph(id="p1", bbox=bbox, line_height=24.0, lines=[line])
+    blocks = [TextBlock(id="b1", page=1, bbox=bbox, text="Normal text BIG", origin_y=110.0, font_size=20.0)]
+    region = Region(id="reg1", bbox=bbox, paragraphs=[paragraph])
     page = Page(number=1, width=600, height=800, text_blocks=blocks, regions=[region])
     return Document(project_id="p", pages=[page], fonts=fonts), page
 
@@ -140,7 +158,7 @@ def test_render_tree_is_deterministic() -> None:
     assert html_a == html_b
 
 
-# ---- Rule 3 (R-2): real paragraphs, NO line elements -------------------------
+# ---- Rule 3: semantic paragraphs, absolutely-positioned lines --------------
 
 def test_dom_is_region_wrapping_one_p_per_paragraph() -> None:
     document, page = _document()
@@ -151,18 +169,31 @@ def test_dom_is_region_wrapping_one_p_per_paragraph() -> None:
     html = fragments[0]
     assert html.startswith('<div class="lf-region"')
     assert html.count('class="lf-paragraph') == 1  # ONE <p> for both source lines
-    assert "lf-line" not in html  # lines are engine-only — NEVER in HTML
-    assert html.count("<span") == 2  # bold + risen runs only
-    assert " world <span" in html and ">second line here</span>" in html
+    # Every PDF line is its own DOM element — a paragraph is a purely
+    # semantic wrapper now.
+    assert html.count('class="lf-line"') == 2
+    assert html.count("<span") == 4  # 2 lf-line wrappers + bold + risen runs
+    # No join character of any kind between lines — they're separate
+    # elements, not text glued together with a space or a forced \n.
+    assert "world</span><span class=\"lf-line\"" in html
+    assert ">second line here</span>" in html
 
 
-def test_adjacent_same_style_runs_merge_across_lines() -> None:
+def test_runs_merge_within_line_not_across() -> None:
+    """Adjacent same-style runs merge WITHIN one line (unchanged behavior),
+    but merging can never cross a line boundary — each PDF line is its own
+    DOM element, so there is no "next line's text" to merge into."""
     document, page = _document()
     page.regions[0].paragraphs[0].lines[1].runs[0].rise = 0.0
     tree = build_render_tree(document, page)
     paragraph = tree.children[0].children[0]
-    texts = [c.text for c in paragraph.children]
-    assert " world second line here" in texts
+    lines = [c for c in paragraph.children if c.kind == "line"]
+    assert len(lines) == 2
+    line1_texts = [c.text for c in lines[0].children]
+    line2_texts = [c.text for c in lines[1].children]
+    assert " world" in line1_texts  # stays on line 1, never merges with line 2
+    assert "second line here" in line2_texts
+    assert " world" not in line2_texts and "second line here" not in line1_texts
 
 
 def test_rise_is_emitted_as_data_not_decided() -> None:
@@ -174,27 +205,145 @@ def test_rise_is_emitted_as_data_not_decided() -> None:
     assert "top: -3.5px" in html
 
 
-def test_paragraph_carries_typography_not_lines() -> None:
+def test_paragraph_is_semantic_only_lines_carry_layout() -> None:
+    """A paragraph never flows text or owns position/size — it's a semantic
+    wrapper around its own `line` children, each of which is absolutely
+    positioned and owns its own `line-height`."""
     document, page = _document()
     tree = build_render_tree(document, page)
     paragraph = tree.children[0].children[0]
-    assert paragraph.style["line-height"] == "14px"
-    assert paragraph.geometry["width"] == "300px"
-    assert all(c.kind == "run" for c in paragraph.children)
+    assert "line-height" not in paragraph.style
+    assert paragraph.geometry == {}
+    assert all(c.kind == "line" for c in paragraph.children)
+    for line in paragraph.children:
+        assert line.geometry["line-height"] == "14px"
+        assert "top" in line.geometry and "left" in line.geometry
+        assert all(c.kind == "run" for c in line.children)
+
+
+# ---- Line-as-absolute-primitive: position from baseline, not flow ----------
+
+def test_paragraph_has_one_line_node_per_pdf_line() -> None:
+    """Validation criterion (1): number of HTML lines == number of
+    extracted PDF lines. Never merged, never split."""
+    document, page = _three_line_paragraph_document()
+    tree = build_render_tree(document, page)
+    paragraph = tree.children[0].children[0]
+    lines = [c for c in paragraph.children if c.kind == "line"]
+    assert len(lines) == len(page.regions[0].paragraphs[0].lines) == 3
+
+
+def test_line_top_left_computed_from_baseline_and_ascent() -> None:
+    """`top = baseline_y - ascent - region.bbox.y` (half-leading collapses
+    to zero here because `line-height` is set to the line's own natural
+    `leading`); `left = bbox.x - region.bbox.x`. Baselines 100/116/128,
+    ascent 10, region top 90 -> tops 0/16/28 — the raw PDF baseline deltas,
+    with zero chain math involved."""
+    document, page = _three_line_paragraph_document()
+    tree = build_render_tree(document, page)
+    lines = [c for c in tree.children[0].children[0].children if c.kind == "line"]
+    assert lines[0].geometry == {"left": "0px", "top": "0px", "line-height": "14px"}
+    assert lines[1].geometry["top"] == "16px"
+    assert lines[2].geometry["top"] == "28px"
+
+
+def test_runs_stay_nested_under_their_own_line() -> None:
+    """Validation criteria (2)/(3): every HTML line starts/ends with
+    exactly the same content as its PDF line — structurally guaranteed
+    here since runs are never flattened across a line boundary."""
+    document, page = _three_line_paragraph_document()
+    tree = build_render_tree(document, page)
+    lines = [c for c in tree.children[0].children[0].children if c.kind == "line"]
+    for i, line_node in enumerate(lines):
+        pdf_line = page.regions[0].paragraphs[0].lines[i]
+        assert line_node.children[0].text == pdf_line.runs[0].text
+        assert line_node.children[-1].text == pdf_line.runs[-1].text
+
+
+def test_line_left_uses_its_own_bbox_x() -> None:
+    """A line's own measured `bbox.x` captures indentation/alignment
+    geometrically now — the paragraph no longer asserts text-align/
+    text-indent of its own (removed with the flow-chain model)."""
+    document, page = _three_line_paragraph_document()
+    page.regions[0].paragraphs[0].lines[1].bbox = BoundingBox(80, 106, 270, 14)  # indented
+    tree = build_render_tree(document, page)
+    lines = [c for c in tree.children[0].children[0].children if c.kind == "line"]
+    assert lines[1].geometry["left"] == "30px"  # 80 - region.bbox.x(50)
+
+
+def test_mixed_font_line_offset_uses_tallest_run() -> None:
+    """The line's own top comes from the run whose local (ascent +
+    half-leading) offset is largest, not just the primary run's — for a
+    20px base run + a 30px bold run (ascent 16/leading 24 at 20px), the
+    30px run's scaled offset (18.0) exceeds the base run's (16.0), so
+    top = 110 - 18 - region.bbox.y(90) = 2px."""
+    document, page = _mixed_font_size_line_document()
+    tree = build_render_tree(document, page)
+    line = tree.children[0].children[0].children[0]
+    assert line.geometry["top"] == "2px"
+
+
+def test_line_dom_shape() -> None:
+    document, page = _document()
+    tree = build_render_tree(document, page)
+    html = compile_page_text_layer(tree)[0]
+    assert '<p class="lf-paragraph"' in html
+    assert '<span class="lf-line"' in html
+    assert 'class="lf-line" data-object-id=' in html
+    assert 'style="left: 0px; top: 0px; line-height: 14px"' in html
+
+
+def test_validator_requires_top_and_left_on_absolute_line() -> None:
+    document, page = _document()
+    tree = build_render_tree(document, page)
+    line_node = tree.children[0].children[0].children[0]
+    del line_node.geometry["top"]
+    with pytest.raises(RenderTreeValidationError, match="missing"):
+        validate_render_tree(tree, page)
+
+
+def test_validator_rejects_unlisted_line_property() -> None:
+    document, page = _document()
+    tree = build_render_tree(document, page)
+    line_node = tree.children[0].children[0].children[0]
+    line_node.geometry["z-index"] = "5"
+    with pytest.raises(RenderTreeValidationError, match="Rule 0.1"):
+        validate_render_tree(tree, page)
+
+
+def test_validator_accepts_absolute_line_geometry() -> None:
+    document, page = _three_line_paragraph_document()
+    tree = build_render_tree(document, page)
+    validate_render_tree(tree, page)  # must not raise
+
+
+def test_validator_rejects_line_count_mismatch() -> None:
+    document, page = _three_line_paragraph_document()
+    tree = build_render_tree(document, page)
+    paragraph_node = tree.children[0].children[0]
+    # Simulate a builder bug that collapses two PDF lines into one line
+    # node — moves the last line's runs into the previous line and drops
+    # the now-empty node, so total unicode content is UNCHANGED (rules out
+    # the unicode-mismatch check firing instead) but the structural line
+    # count no longer matches the PDF's — only criterion (1)'s dedicated
+    # check catches this.
+    paragraph_node.children[-2].children.extend(paragraph_node.children[-1].children)
+    del paragraph_node.children[-1]
+    with pytest.raises(RenderTreeValidationError, match="line count diverges"):
+        validate_render_tree(tree, page)
 
 
 # ---- Rule 0: one dimension, one owner ---------------------------------------
 
-def test_flowed_paragraph_has_no_top_or_height() -> None:
-    """The exact defect from the field: a flowed paragraph must never assert
-    an absolute position or a height — both are browser-owned."""
+def test_paragraph_carries_no_geometry() -> None:
+    """A paragraph never flows or positions text — it must never assert
+    ANY geometry (top/left/height/width/margin/...), since every line
+    positions itself absolutely and nothing needs a paragraph-level box."""
     document, page = _two_paragraph_document()
     tree = build_render_tree(document, page)
     for region in tree.children:
         for paragraph in region.children:
-            assert "top" not in paragraph.geometry
-            assert "height" not in paragraph.geometry
-            assert "left" not in paragraph.geometry
+            assert paragraph.geometry == {}
 
 
 def test_only_the_region_is_absolutely_anchored() -> None:
@@ -206,62 +355,19 @@ def test_only_the_region_is_absolutely_anchored() -> None:
     assert all(p.mode == "normal" for p in region.children)
 
 
-def test_margin_top_equals_the_pdf_measured_gap() -> None:
-    document, page = _two_paragraph_document(gap=6.0)
+def test_two_paragraphs_lines_are_independently_positioned() -> None:
+    """The structural guarantee behind the fix: each paragraph's line `top`
+    is computed purely from its OWN baseline_y/ascent/leading and the
+    region's anchor — never from the other paragraph's rendered size, even
+    when the two paragraphs' PDF boxes genuinely overlap (the real
+    cover-page shape). Baselines 110/118, ascent 10, region top 100 ->
+    tops 0px/8px, straight from the PDF measurements."""
+    document, page = _two_paragraph_document()
     tree = build_render_tree(document, page)
-    paragraphs = tree.children[0].children
-    assert paragraphs[0].geometry.get("margin-top", "0px") in ("0px", "0")
-    assert paragraphs[1].geometry["margin-top"] == "6px"
-
-
-def test_negative_gap_is_preserved_not_clamped() -> None:
-    """2026-07-13 policy: a negative measured gap means the two paragraphs'
-    PDF bounding boxes genuinely overlap (found on a real book cover — a
-    title's tall glyph bbox overlapping its tagline by 31pt). That is real
-    geometry, not noise — clamping it to 0 would be the Instruction Builder
-    repairing/destroying a measurement, which Rule 4 forbids. CSS
-    `margin-top` natively supports negative values, so the exact measured
-    gap is emitted as-is, whatever its sign."""
-    document, page = _two_paragraph_document(gap=-2.0)
-    tree = build_render_tree(document, page)
-    paragraphs = tree.children[0].children
-    assert paragraphs[1].geometry["margin-top"] == "-2px"
-
-
-def test_large_overlap_matches_the_real_cover_page_case() -> None:
-    """Reproduces the exact real-book finding: a title paragraph (tall
-    hand-drawn display font) whose bbox bottom sits BELOW the next
-    paragraph's bbox top by 31.36pt — genuine PDF overlap, not noise."""
-    document, page = _two_paragraph_document(gap=-31.36)
-    tree = build_render_tree(document, page)
-    paragraphs = tree.children[0].children
-    assert paragraphs[1].geometry["margin-top"] == "-31.36px"
-
-
-def test_chain_anchor_uses_rendered_height_not_ink_bbox() -> None:
-    """2026-07-14: the chain anchor for the NEXT paragraph's margin-top must
-    be `line_count * line_height` (what the browser actually renders), not
-    the PDF's ink-tight bbox.height — they diverge whenever line_height
-    exceeds the font's own ascent+descent (generously-leaded text). Here
-    paragraph 1 has bbox.height=16 but renders as 2*10=20; paragraph 2's
-    true PDF top is 30, so the correct margin is 30-20=10, not 30-16=14."""
-    document, page = _multiline_then_single_document()
-    tree = build_render_tree(document, page)
-    paragraphs = tree.children[0].children
-    assert paragraphs[1].geometry["margin-top"] == "10px"
-
-
-def test_taller_render_pushes_next_paragraph_not_overlaps() -> None:
-    """Structural guarantee behind the fix: because paragraph 2's position is
-    a MARGIN relative to paragraph 1 (normal flow), not an absolute PDF
-    coordinate, the browser will push it down if paragraph 1 renders taller
-    than the PDF implied — this is what CSS normal flow does by
-    construction; verified here as the absence of any competing absolute
-    top on paragraph 2."""
-    document, page = _two_paragraph_document(gap=2.0)
-    tree = build_render_tree(document, page)
-    second = tree.children[0].children[1]
-    assert "top" not in second.geometry  # nothing can compete with flow
+    para1_line = tree.children[0].children[0].children[0]
+    para2_line = tree.children[0].children[1].children[0]
+    assert para1_line.geometry["top"] == "0px"
+    assert para2_line.geometry["top"] == "8px"
 
 
 def test_validator_rejects_top_on_a_flowed_paragraph() -> None:
@@ -310,10 +416,10 @@ def test_validator_rejects_unlisted_geometry_property() -> None:
         validate_render_tree(tree, page)
 
 
-def test_validator_accepts_allowed_flow_properties() -> None:
-    """Every property the real builder actually emits on a flow paragraph —
-    width, margin-top, margin-left, plus base run style — must pass clean."""
-    document, page = _two_paragraph_document(gap=6.0)
+def test_validator_accepts_paragraph_typography_only() -> None:
+    """A paragraph carries only base-run typography (color/font-family/...)
+    and no geometry at all — the only thing left for it to legitimately own."""
+    document, page = _two_paragraph_document()
     tree = build_render_tree(document, page)
     validate_render_tree(tree, page)  # must not raise
 
@@ -323,7 +429,9 @@ def test_validator_accepts_allowed_flow_properties() -> None:
 def test_validator_rejects_unicode_loss() -> None:
     document, page = _document()
     tree = build_render_tree(document, page)
-    tree.children[0].children[0].children[0].text = tree.children[0].children[0].children[0].text[:-3]
+    # region -> paragraph -> line -> run
+    run = tree.children[0].children[0].children[0].children[0]
+    run.text = run.text[:-3]
     with pytest.raises(RenderTreeValidationError, match="unicode mismatch"):
         validate_render_tree(tree, page)
 
@@ -367,14 +475,20 @@ def test_every_paragraph_and_span_carries_a_complete_inline_style() -> None:
     html = "".join(compile_page_text_layer(build_render_tree(document, page)))
     # The base paragraph style: color/font-family/font-size/font-weight/
     # font-style/letter-spacing/word-spacing/writing-mode always present.
-    assert 'style="width: 300px; margin-top: 0px; color: #000000; font-family:' in html
+    # No geometry (2026-07-15b) — a paragraph asserts none.
+    assert 'style="color: #000000; font-family:' in html
     assert "font-weight: 400" in html
     assert "font-style: normal" in html
     assert "letter-spacing: 0px" in html
     assert "word-spacing: 0px" in html
     assert "writing-mode: horizontal-tb" in html
-    # The differing "bold" run's span carries its own complete style, not a diff.
-    span_start = html.index("<span", html.index(">bold</span>") - 400)
+    # The differing "bold" run's span carries its own complete style, not a
+    # diff. Search specifically for `<span style="` (the run's OWN span) —
+    # `rindex` finds the nearest one before "bold", never the preceding
+    # `<span class="lf-line">` wrapper, which has no bare `style=` prefix
+    # (it's always `class="lf-line" data-object-id="..." style="..."`).
+    bold_end = html.index(">bold</span>")
+    span_start = html.rindex('<span style="', 0, bold_end)
     span = html[span_start:html.index(">", span_start) + 1]
     for prop in ("color:", "font-family:", "font-size:", "font-weight:", "font-style:", "letter-spacing:"):
         assert prop in span, f"{prop} missing from differing run's inline style: {span}"

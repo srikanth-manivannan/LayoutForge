@@ -74,7 +74,20 @@ def collect(art: RunArtifacts) -> dict:
     css = (semantic_dir / "semantic.css")
     css_text = css.read_text(encoding="utf-8") if css.exists() else ""
 
-    legacy_spans = sum(h.count("<span") for h in legacy_pages)
+    # `legacy_pages` (`pages/*.html`) is the RIL compiler's output, which
+    # inlines all style (Rendering Stabilization phase) — its spans are
+    # EITHER `<span style="...">` (a genuine style-differentiation run) OR
+    # `<span class="lf-line">` (a structural per-PDF-line wrapper, Line
+    # Layout Engine, 2026-07-15). Count only the former: this metric's
+    # whole point is tracking span REDUCTION from the retired word-pinned
+    # renderer, and a line wrapper is not word-pinning/style-splitting.
+    #
+    # `semantic_pages` (`pages_semantic/*.html`, the separate html_writer.py
+    # Style-Registry-based writer) uses a different convention (`<span
+    # class="lf-rN">` for style, PLUS its own `<span class="lf-line">`
+    # wrappers) — left as a plain `<span` count, unrelated to today's RIL
+    # change and not this fix's concern.
+    legacy_spans = sum(h.count('<span style="') for h in legacy_pages)
     semantic_spans = sum(h.count("<span") for h in semantic_pages)
     per_page_semantic_spans = [h.count("<span") for h in semantic_pages] or [0]
 

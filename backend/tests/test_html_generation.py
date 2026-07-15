@@ -45,10 +45,12 @@ def test_html_output_writes_semantic_layered_pages(db_session, tmp_path: Path, r
     assert 'class="lf-layer lf-layer-text"' in html
     assert 'data-type="background"' in html
 
-    # RIL DOM (Rule 3): paragraph → line → run; uniform-style text is plain
-    # text nodes; no legacy artifacts.
+    # RIL DOM, Line Layout Engine (2026-07-15): paragraph -> line -> run;
+    # every PDF line is its own `<span class="lf-line">`, PDF-baseline-
+    # positioned, never browser-wrapped; uniform-style text within a line
+    # is a plain text node; no legacy artifacts.
     assert 'class="lf-paragraph' in html
-    assert "lf-line" not in html  # R-2: one <p> per paragraph, browser wraps
+    assert 'class="lf-line"' in html
     assert "Page 1 heading" in html
     assert 'class="lf-word"' not in html
     assert "lf-text-block" not in html
@@ -56,7 +58,9 @@ def test_html_output_writes_semantic_layered_pages(db_session, tmp_path: Path, r
     # Stable ids survive on paragraph and line nodes (one selection pipeline).
     page_one = context.document.get_page(1)
     paragraph_ids = [p.id for r in page_one.regions for p in r.paragraphs]
+    line_ids = [line.id for r in page_one.regions for p in r.paragraphs for line in p.lines]
     assert any(f'data-object-id="{pid}"' in html for pid in paragraph_ids)
+    assert any(f'data-object-id="{lid}"' in html for lid in line_ids)
 
     image = page_one.images[0]
     assert f'id="img-{image.id}"' in html
